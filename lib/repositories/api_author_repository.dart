@@ -4,10 +4,9 @@ import 'api_repository.dart';
 import 'author_repository.dart';
 import 'book_repository.dart';
 
-class ApiAuthorRepository extends ApiRepository<Author, AuthorQuery>
-    implements AuthorRepository {
+class ApiAuthorRepository extends ApiRepository<Author, AuthorQuery> implements AuthorRepository {
   ApiAuthorRepository({required super.dio, required this.books})
-      : super(resource: 'authors', cacheAll: true);
+    : super(resource: 'authors', cacheAll: true);
 
   final BookRepository books;
 
@@ -22,13 +21,13 @@ class ApiAuthorRepository extends ApiRepository<Author, AuthorQuery>
 
   @override
   Map<String, dynamic> queryOf(AuthorQuery query) => pagingQuery(
-        search: query.search,
-        sortField: query.sortField,
-        sortAscending: query.sortAscending,
-        page: query.page,
-        size: query.size,
-        includeDeleted: query.includeDeleted,
-      );
+    search: query.search,
+    sortField: query.sortField,
+    sortAscending: query.sortAscending,
+    page: query.page,
+    size: query.size,
+    includeDeleted: query.includeDeleted,
+  );
 
   @override
   Future<String?> deleteBlocker(int id, {required bool permanent}) async {

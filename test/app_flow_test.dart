@@ -15,9 +15,7 @@ void main() {
     final repos = await signedIn(tester, server);
     server.delay = const Duration(milliseconds: 50);
 
-    await tester.pumpWidget(
-      LibraryApp(repositories: repos, initialLocation: '/books'),
-    );
+    await tester.pumpWidget(LibraryApp(repositories: repos, initialLocation: '/books'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 5));
     await tester.pump(const Duration(milliseconds: 5));
@@ -30,14 +28,14 @@ void main() {
     expect(find.text('Идиот'), findsWidgets);
   });
 
-  testWidgets('Недоступный сервер показывает ошибку, кнопка повтора загружает данные', (tester) async {
+  testWidgets('Недоступный сервер показывает ошибку, кнопка повтора загружает данные', (
+    tester,
+  ) async {
     useLargeScreen(tester);
     final repos = await signedIn(tester, server);
     server.down = true;
 
-    await tester.pumpWidget(
-      LibraryApp(repositories: repos, initialLocation: '/books'),
-    );
+    await tester.pumpWidget(LibraryApp(repositories: repos, initialLocation: '/books'));
     await tester.pumpAndSettle();
 
     expect(find.textContaining('Не удалось загрузить список'), findsOneWidget);
@@ -56,10 +54,7 @@ void main() {
     final repos = await signedIn(tester, server);
 
     await tester.pumpWidget(
-      LibraryApp(
-        repositories: repos,
-        initialLocation: '/books?search=zzzzzz',
-      ),
+      LibraryApp(repositories: repos, initialLocation: '/books?search=zzzzzz'),
     );
     await tester.pumpAndSettle();
 
@@ -71,12 +66,7 @@ void main() {
     useLargeScreen(tester);
     final repos = await signedIn(tester, server);
 
-    await tester.pumpWidget(
-      LibraryApp(
-        repositories: repos,
-        initialLocation: '/books/new',
-      ),
-    );
+    await tester.pumpWidget(LibraryApp(repositories: repos, initialLocation: '/books/new'));
     await tester.pumpAndSettle();
 
     expect(find.text('Новая книга'), findsOneWidget);
@@ -95,12 +85,7 @@ void main() {
     useLargeScreen(tester);
     final repos = await signedIn(tester, server);
 
-    await tester.pumpWidget(
-      LibraryApp(
-        repositories: repos,
-        initialLocation: '/genres/new',
-      ),
-    );
+    await tester.pumpWidget(LibraryApp(repositories: repos, initialLocation: '/genres/new'));
     await tester.pumpAndSettle();
 
     await tester.enterText(find.widgetWithText(TextFormField, 'Название *'), 'Роман');
@@ -115,12 +100,7 @@ void main() {
     useLargeScreen(tester);
     final repos = await signedIn(tester, server);
 
-    await tester.pumpWidget(
-      LibraryApp(
-        repositories: repos,
-        initialLocation: '/publishers',
-      ),
-    );
+    await tester.pumpWidget(LibraryApp(repositories: repos, initialLocation: '/publishers'));
     await tester.pumpAndSettle();
 
     expect(find.text('Азбука'), findsWidgets);

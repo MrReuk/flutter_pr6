@@ -56,10 +56,7 @@ void main() {
   });
 
   test('предупреждение не длиннее самого срока бездействия', () {
-    const odd = SessionPolicy(
-      inactivity: Duration(seconds: 20),
-      warning: Duration(seconds: 30),
-    );
+    const odd = SessionPolicy(inactivity: Duration(seconds: 20), warning: Duration(seconds: 30));
 
     expect(odd.warnAfter, Duration.zero);
   });

@@ -1,9 +1,6 @@
 typedef FieldCheck = String? Function(String value);
 
-typedef TextValidator = String? Function(
-  String value,
-  Map<String, Object?> values,
-);
+typedef TextValidator = String? Function(String value, Map<String, Object?> values);
 
 typedef IdValidator = String? Function(int? value);
 
@@ -43,9 +40,7 @@ FieldCheck namePattern() {
   return (value) {
     final text = value.trim();
     if (text.isEmpty) return null;
-    return pattern.hasMatch(text)
-        ? null
-        : 'Допустимы только буквы, пробел, точка и дефис';
+    return pattern.hasMatch(text) ? null : 'Допустимы только буквы, пробел, точка и дефис';
   };
 }
 
@@ -99,9 +94,7 @@ FieldCheck isbnFormat() {
     final text = value.trim();
     if (text.isEmpty) return null;
     final digits = text.replaceAll(RegExp(r'[\s-]'), '');
-    return pattern.hasMatch(digits)
-        ? null
-        : 'ISBN состоит из 10 или 13 цифр, дефисы допускаются';
+    return pattern.hasMatch(digits) ? null : 'ISBN состоит из 10 или 13 цифр, дефисы допускаются';
   };
 }
 

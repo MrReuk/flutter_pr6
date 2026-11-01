@@ -2,6 +2,16 @@ import 'package:flutter/material.dart';
 
 import '../state/unsaved_changes.dart';
 
+/// Наибольшая ширина текста в диалоге. Диалог не растягивается на весь монитор.
+const double kDialogMaxWidth = 440;
+
+Widget _dialogText(String message) {
+  return ConstrainedBox(
+    constraints: const BoxConstraints(maxWidth: kDialogMaxWidth),
+    child: Text(message),
+  );
+}
+
 Future<bool> confirmAction(
   BuildContext context, {
   required String title,
@@ -13,7 +23,7 @@ Future<bool> confirmAction(
     context: context,
     builder: (dialogContext) => AlertDialog(
       title: Text(title),
-      content: Text(message),
+      content: _dialogText(message),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(dialogContext).pop(false),
@@ -29,20 +39,13 @@ Future<bool> confirmAction(
   return result ?? false;
 }
 
-Future<void> showNotice(
-  BuildContext context, {
-  required String title,
-  required String message,
-}) {
+Future<void> showNotice(BuildContext context, {required String title, required String message}) {
   return showDialog<void>(
     context: context,
     builder: (dialogContext) => AlertDialog(
-      icon: Icon(
-        Icons.block,
-        color: Theme.of(dialogContext).colorScheme.error,
-      ),
+      icon: Icon(Icons.block, color: Theme.of(dialogContext).colorScheme.error),
       title: Text(title),
-      content: Text(message),
+      content: _dialogText(message),
       actions: [
         FilledButton(
           onPressed: () => Navigator.of(dialogContext).pop(),

@@ -26,17 +26,14 @@ class DebouncedTextField extends StatefulWidget {
 }
 
 class _DebouncedTextFieldState extends State<DebouncedTextField> {
-  late final TextEditingController _controller =
-      TextEditingController(text: widget.value);
+  late final TextEditingController _controller = TextEditingController(text: widget.value);
   Timer? _timer;
 
   @override
   void didUpdateWidget(DebouncedTextField oldWidget) {
     super.didUpdateWidget(oldWidget);
     final typing = _timer?.isActive ?? false;
-    if (widget.value != oldWidget.value &&
-        widget.value != _controller.text &&
-        !typing) {
+    if (widget.value != oldWidget.value && widget.value != _controller.text && !typing) {
       _controller.value = TextEditingValue(
         text: widget.value,
         selection: TextSelection.collapsed(offset: widget.value.length),

@@ -31,13 +31,13 @@ class FakeUser {
   final int? readerId;
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'username': username,
-        'fullName': fullName,
-        'email': '$username@example.com',
-        'role': role,
-        'readerId': readerId,
-      };
+    'id': id,
+    'username': username,
+    'fullName': fullName,
+    'email': '$username@example.com',
+    'role': role,
+    'readerId': readerId,
+  };
 }
 
 class FakeServer implements HttpClientAdapter {
@@ -85,13 +85,37 @@ class FakeServer implements HttpClientAdapter {
         {'id': 2, 'name': 'Фантастика', 'description': '', 'deletedAt': null},
       ],
       'publishers': [
-        {'id': 1, 'name': 'Азбука', 'city': 'Санкт-Петербург', 'foundedYear': 1995, 'deletedAt': null},
+        {
+          'id': 1,
+          'name': 'Азбука',
+          'city': 'Санкт-Петербург',
+          'foundedYear': 1995,
+          'deletedAt': null,
+        },
         {'id': 2, 'name': 'Эксмо', 'city': 'Москва', 'foundedYear': 1991, 'deletedAt': null},
-        {'id': 3, 'name': 'Питер', 'city': 'Санкт-Петербург', 'foundedYear': 1991, 'deletedAt': null},
+        {
+          'id': 3,
+          'name': 'Питер',
+          'city': 'Санкт-Петербург',
+          'foundedYear': 1991,
+          'deletedAt': null,
+        },
       ],
       'authors': [
-        {'id': 1, 'fullName': 'Достоевский Ф. М.', 'birthYear': 1821, 'country': 'Россия', 'deletedAt': null},
-        {'id': 2, 'fullName': 'Оруэлл Дж.', 'birthYear': 1903, 'country': 'Великобритания', 'deletedAt': null},
+        {
+          'id': 1,
+          'fullName': 'Достоевский Ф. М.',
+          'birthYear': 1821,
+          'country': 'Россия',
+          'deletedAt': null,
+        },
+        {
+          'id': 2,
+          'fullName': 'Оруэлл Дж.',
+          'birthYear': 1903,
+          'country': 'Великобритания',
+          'deletedAt': null,
+        },
       ],
       'books': [
         _book(1, 'Идиот', '978-5-389-07773-7', 1869, 1, [1], [1], 2, 2),
@@ -175,8 +199,12 @@ class FakeServer implements HttpClientAdapter {
       'year': year,
       'pages': 300,
       'publisher': {'id': publisherId, 'name': 'Издательство $publisherId'},
-      'authors': [for (final a in authorIds) {'id': a, 'fullName': 'Автор $a'}],
-      'genres': [for (final g in genreIds) {'id': g, 'name': 'Жанр $g'}],
+      'authors': [
+        for (final a in authorIds) {'id': a, 'fullName': 'Автор $a'},
+      ],
+      'genres': [
+        for (final g in genreIds) {'id': g, 'name': 'Жанр $g'},
+      ],
       'copiesTotal': total,
       'copiesAvailable': available,
       'deletedAt': null,
@@ -242,10 +270,7 @@ class FakeServer implements HttpClientAdapter {
     }
 
     if (down) {
-      throw DioException.connectionError(
-        requestOptions: options,
-        reason: 'Connection refused',
-      );
+      throw DioException.connectionError(requestOptions: options, reason: 'Connection refused');
     }
     return _route(options);
   }
@@ -263,8 +288,7 @@ class FakeServer implements HttpClientAdapter {
     );
   }
 
-  ResponseBody _fail(int status, String message) =>
-      _json(status, {'message': message});
+  ResponseBody _fail(int status, String message) => _json(status, {'message': message});
 
   Future<ResponseBody> _route(RequestOptions options) async {
     final method = options.method.toUpperCase();
@@ -328,10 +352,16 @@ class FakeServer implements HttpClientAdapter {
       if (malformed) return _json(200, {'oops': 1});
       var visible = rows;
       if (current.role == 'reader' && collection == 'loans') {
-        visible = [for (final r in rows) if (jsonRefId(r['reader']) == current.readerId) r];
+        visible = [
+          for (final r in rows)
+            if (jsonRefId(r['reader']) == current.readerId) r,
+        ];
       }
       if (current.role == 'reader' && collection == 'readers') {
-        visible = [for (final r in rows) if (r['id'] == current.readerId) r];
+        visible = [
+          for (final r in rows)
+            if (r['id'] == current.readerId) r,
+        ];
       }
       return _json(200, _list(collection, visible, query));
     }
@@ -421,8 +451,7 @@ class FakeServer implements HttpClientAdapter {
 
   bool _atLeast(FakeUser user, String role) => _roleLevel[user.role]! >= _roleLevel[role]!;
 
-  ResponseBody _forbidden(String role) =>
-      _fail(403, 'Операция доступна начиная с роли «$role»');
+  ResponseBody _forbidden(String role) => _fail(403, 'Операция доступна начиная с роли «$role»');
 
   /// Права как в КОНТРАКТ-API.md, раздел 2.2.
   ResponseBody? _checkRole(
@@ -505,8 +534,7 @@ class FakeServer implements HttpClientAdapter {
     return _fail(404, 'Адрес не обслуживается');
   }
 
-  int _bounded(int value, int low, int high) =>
-      value < low ? low : (value > high ? high : value);
+  int _bounded(int value, int low, int high) => value < low ? low : (value > high ? high : value);
 
   Map<String, dynamic>? _find(List<Map<String, dynamic>> rows, int id) {
     for (final row in rows) {
@@ -567,7 +595,9 @@ class FakeServer implements HttpClientAdapter {
     List<Map<String, dynamic>> source,
     Map<String, String> query,
   ) {
-    var rows = source.where((r) => query['includeDeleted'] == 'true' || r['deletedAt'] == null).toList();
+    var rows = source
+        .where((r) => query['includeDeleted'] == 'true' || r['deletedAt'] == null)
+        .toList();
 
     final needle = (query['search'] ?? '').toLowerCase();
     if (needle.isNotEmpty) {

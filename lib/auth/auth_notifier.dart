@@ -43,9 +43,9 @@ class AuthNotifier extends ChangeNotifier implements AuthGateway {
     required AuthApi api,
     this.policy = const SessionPolicy(),
     DateTime Function()? now,
-  })  : _prefs = prefs,
-        _api = api,
-        _now = now ?? DateTime.now;
+  }) : _prefs = prefs,
+       _api = api,
+       _now = now ?? DateTime.now;
 
   final SharedPreferences _prefs;
   final AuthApi _api;
@@ -163,12 +163,7 @@ class AuthNotifier extends ChangeNotifier implements AuthGateway {
     required String fullName,
     required String email,
   }) async {
-    await _api.register(
-      username: username,
-      password: password,
-      fullName: fullName,
-      email: email,
-    );
+    await _api.register(username: username, password: password, fullName: fullName, email: email);
     await login(username, password);
   }
 

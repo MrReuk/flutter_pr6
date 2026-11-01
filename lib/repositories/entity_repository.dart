@@ -26,11 +26,7 @@ typedef PublisherRepository = EntityRepository<Publisher, SimpleQuery>;
 typedef ReaderRepository = EntityRepository<Reader, SimpleQuery>;
 
 abstract interface class LoanRepository implements EntityRepository<Loan, SimpleQuery> {
-  Future<Loan> issue({
-    required int readerId,
-    required int bookId,
-    required int days,
-  });
+  Future<Loan> issue({required int readerId, required int bookId, required int days});
 
   Future<Loan> markReturned(int id);
 

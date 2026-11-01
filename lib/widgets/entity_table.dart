@@ -26,7 +26,7 @@ class CellText extends StatelessWidget {
   Widget build(BuildContext context) {
     return ConstrainedBox(
       constraints: BoxConstraints(maxWidth: maxWidth),
-      child: Text(text),
+      child: Text(text, maxLines: 2, overflow: TextOverflow.ellipsis),
     );
   }
 }
@@ -63,10 +63,6 @@ class EntityTable<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.sizeOf(context).width;
-    final visible = columns.where((c) => width >= c.hideBelow).toList();
-    final sortIndex = visible.indexWhere((c) => c.sortField == sortField);
-    final activeIndex = sortField == null || sortIndex < 0 ? null : sortIndex;
     final toggle = onToggleSelect;
     final selectAll = onSelectAll;
     final sort = onSort;
@@ -76,13 +72,21 @@ class EntityTable<T> extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
+        // Столбцы скрываются по ширине, доступной таблице, а не всему окну:
+        // часть окна занимает боковая полоса меню.
+        final visible = columns.where((c) => constraints.maxWidth >= c.hideBelow).toList();
+        final sortIndex = visible.indexWhere((c) => c.sortField == sortField);
+        final activeIndex = sortField == null || sortIndex < 0 ? null : sortIndex;
+
+        // Двумерная прокрутка: вниз по строкам и вбок, если столбцы не помещаются.
+        // minWidth растягивает таблицу на всю ширину на широком окне.
         return SingleChildScrollView(
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: ConstrainedBox(
               constraints: BoxConstraints(minWidth: constraints.maxWidth),
               child: DataTable(
-                columnSpacing: 24,
+                columnSpacing: 20,
                 horizontalMargin: 16,
                 showCheckboxColumn: toggle != null,
                 sortColumnIndex: activeIndex,
@@ -131,18 +135,14 @@ class EntityTable<T> extends StatelessWidget {
             Opacity(
               opacity: deleted ? 0.5 : 1,
               child: DefaultTextStyle.merge(
-                style: TextStyle(
-                  decoration: deleted ? TextDecoration.lineThrough : null,
-                ),
+                style: TextStyle(decoration: deleted ? TextDecoration.lineThrough : null),
                 child: column.build(item),
               ),
             ),
             onTap: open == null ? null : () => open(item),
           ),
         if (rowActions != null)
-          DataCell(
-            Row(mainAxisSize: MainAxisSize.min, children: rowActions(item)),
-          ),
+          DataCell(Row(mainAxisSize: MainAxisSize.min, children: rowActions(item))),
       ],
     );
   }

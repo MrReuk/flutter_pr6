@@ -102,17 +102,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
               controller: _fullName,
               enabled: !_busy,
               textInputAction: TextInputAction.next,
-              decoration: const InputDecoration(
-                labelText: 'ФИО',
-                border: OutlineInputBorder(),
-              ),
+              decoration: const InputDecoration(labelText: 'ФИО', border: OutlineInputBorder()),
               validator: (value) {
                 final text = value ?? '';
-                return checks([
-                  notBlank('Введите ФИО'),
-                  minLength(3),
-                  maxLength(80),
-                ])(text, const {}) ??
+                return checks([notBlank('Введите ФИО'), minLength(3), maxLength(80)])(
+                      text,
+                      const {},
+                    ) ??
                     _fromServer('fullName');
               },
             ),
@@ -148,8 +144,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 labelText: 'Электронная почта (необязательно)',
                 border: OutlineInputBorder(),
               ),
-              validator: (value) =>
-                  emailFormat()((value ?? '').trim()) ?? _fromServer('email'),
+              validator: (value) => emailFormat()((value ?? '').trim()) ?? _fromServer('email'),
             ),
             const SizedBox(height: 12),
             TextFormField(
@@ -185,9 +180,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Expanded(
                       child: Text(
                         rule.label,
-                        style: TextStyle(
-                          color: rule.ok ? Colors.green : scheme.onSurfaceVariant,
-                        ),
+                        style: TextStyle(color: rule.ok ? Colors.green : scheme.onSurfaceVariant),
                       ),
                     ),
                   ],

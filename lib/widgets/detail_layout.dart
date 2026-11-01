@@ -61,9 +61,7 @@ class DetailField extends StatelessWidget {
         children: [
           Text(
             label,
-            style: theme.textTheme.labelMedium?.copyWith(
-              color: theme.colorScheme.outline,
-            ),
+            style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.outline),
           ),
           const SizedBox(height: 4),
           child,

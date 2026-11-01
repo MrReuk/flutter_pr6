@@ -38,21 +38,14 @@ class LoanListScreen extends StatelessWidget {
             label: 'Состояние',
             value: q.filter,
             choices: [
-              for (final status in LoanStatus.values)
-                (value: status.name, label: status.label),
+              for (final status in LoanStatus.values) (value: status.name, label: status.label),
             ],
             onChanged: (value) => apply(q.copyWith(filter: value)),
           ),
         ],
         columns: (context) => [
-          TableColumnSpec<Loan>(
-            label: 'Читатель',
-            build: (l) => Text(l.readerName),
-          ),
-          TableColumnSpec<Loan>(
-            label: 'Книга',
-            build: (l) => CellText(l.bookTitle, maxWidth: 280),
-          ),
+          TableColumnSpec<Loan>(label: 'Читатель', build: (l) => Text(l.readerName)),
+          TableColumnSpec<Loan>(label: 'Книга', build: (l) => CellText(l.bookTitle, maxWidth: 280)),
           TableColumnSpec<Loan>(
             label: 'Выдана',
             sortField: 'issuedAt',
@@ -68,16 +61,12 @@ class LoanListScreen extends StatelessWidget {
             sortField: 'returnedAt',
             build: (l) => Text(_date(l.returnedAt)),
           ),
-          TableColumnSpec<Loan>(
-            label: 'Состояние',
-            build: (l) => Text(l.status.label),
-          ),
+          TableColumnSpec<Loan>(label: 'Состояние', build: (l) => Text(l.status.label)),
         ],
         idOf: (l) => l.id,
         isDeleted: (l) => l.isDeleted,
         nameOf: (l) => '${l.bookTitle} — ${l.readerName}',
-        subtitleOf: (l) =>
-            '${l.readerName}\n${l.status.label} · до ${_date(l.dueAt)}',
+        subtitleOf: (l) => '${l.readerName}\n${l.status.label} · до ${_date(l.dueAt)}',
         extraActions: (context, loan, reload) => [
           if (!loan.isClosed && !loan.isDeleted)
             IconButton(

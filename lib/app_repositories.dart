@@ -35,11 +35,7 @@ class AppRepositories {
     SessionPolicy policy = const SessionPolicy(),
     Map<String, String> debugFlags = const {},
   }) {
-    final auth = AuthNotifier(
-      prefs: prefs,
-      api: AuthApi(buildAuthDio()),
-      policy: policy,
-    );
+    final auth = AuthNotifier(prefs: prefs, api: AuthApi(buildAuthDio()), policy: policy);
     return AppRepositories(
       dio: buildDio(auth: auth, debugFlags: debugFlags),
       auth: auth,

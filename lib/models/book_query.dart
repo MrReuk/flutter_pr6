@@ -63,8 +63,7 @@ class BookQuery {
       if (yearFrom != null) 'yearFrom': '$yearFrom',
       if (yearTo != null) 'yearTo': '$yearTo',
       if (onlyAvailable) 'available': '1',
-      if (sortField != 'title' || !sortAscending)
-        'sort': formatSortParam(sortField, sortAscending),
+      if (sortField != 'title' || !sortAscending) 'sort': formatSortParam(sortField, sortAscending),
       if (page > 1) 'page': '$page',
       if (size != kDefaultPageSize) 'size': '$size',
       if (includeDeleted) 'deleted': '1',
@@ -73,10 +72,7 @@ class BookQuery {
 
   String toLocation(String path) {
     final params = toParams();
-    return Uri(
-      path: path,
-      queryParameters: params.isEmpty ? null : params,
-    ).toString();
+    return Uri(path: path, queryParameters: params.isEmpty ? null : params).toString();
   }
 
   BookQuery copyWith({
@@ -95,8 +91,7 @@ class BookQuery {
     return BookQuery(
       search: search ?? this.search,
       genreId: identical(genreId, _unset) ? this.genreId : genreId as int?,
-      publisherId:
-          identical(publisherId, _unset) ? this.publisherId : publisherId as int?,
+      publisherId: identical(publisherId, _unset) ? this.publisherId : publisherId as int?,
       yearFrom: identical(yearFrom, _unset) ? this.yearFrom : yearFrom as int?,
       yearTo: identical(yearTo, _unset) ? this.yearTo : yearTo as int?,
       onlyAvailable: onlyAvailable ?? this.onlyAvailable,
@@ -126,16 +121,16 @@ class BookQuery {
 
   @override
   int get hashCode => Object.hash(
-        search,
-        genreId,
-        publisherId,
-        yearFrom,
-        yearTo,
-        onlyAvailable,
-        sortField,
-        sortAscending,
-        page,
-        size,
-        includeDeleted,
-      );
+    search,
+    genreId,
+    publisherId,
+    yearFrom,
+    yearTo,
+    onlyAvailable,
+    sortField,
+    sortAscending,
+    page,
+    size,
+    includeDeleted,
+  );
 }

@@ -5,10 +5,7 @@ import 'api_exceptions.dart';
 import 'auth_gateway.dart';
 import 'config.dart';
 
-const List<Duration> kRetryDelays = [
-  Duration(milliseconds: 600),
-  Duration(milliseconds: 1500),
-];
+const List<Duration> kRetryDelays = [Duration(milliseconds: 600), Duration(milliseconds: 1500)];
 
 const String _kReauthorized = 'reauthorized';
 
@@ -84,9 +81,7 @@ Dio buildAuthDio({String? baseUrl, HttpClientAdapter? adapter}) {
 void _log(RequestOptions options, String outcome) {
   if (!kDebugMode) return;
   final started = options.extra['startedAt'];
-  final elapsed = started is int
-      ? ' ${DateTime.now().millisecondsSinceEpoch - started} мс'
-      : '';
+  final elapsed = started is int ? ' ${DateTime.now().millisecondsSinceEpoch - started} мс' : '';
   debugPrint('[API] ${options.method} ${options.uri} → $outcome$elapsed');
 }
 
@@ -109,11 +104,7 @@ class _AuthInterceptor extends Interceptor {
 }
 
 class _RecoveryInterceptor extends Interceptor {
-  _RecoveryInterceptor({
-    required this.dio,
-    required this.auth,
-    required this.delays,
-  });
+  _RecoveryInterceptor({required this.dio, required this.auth, required this.delays});
 
   final Dio dio;
   final AuthGateway? auth;
@@ -125,8 +116,7 @@ class _RecoveryInterceptor extends Interceptor {
       DioExceptionType.connectionError ||
       DioExceptionType.connectionTimeout ||
       DioExceptionType.sendTimeout ||
-      DioExceptionType.receiveTimeout =>
-        true,
+      DioExceptionType.receiveTimeout => true,
       _ => false,
     };
   }
@@ -201,17 +191,10 @@ class _RecoveryInterceptor extends Interceptor {
   }
 
   DioException _failed(RequestOptions options, ApiException error) {
-    return DioException(
-      requestOptions: options,
-      error: error,
-      type: DioExceptionType.unknown,
-    );
+    return DioException(requestOptions: options, error: error, type: DioExceptionType.unknown);
   }
 
-  Future<void> _replay(
-    RequestOptions options,
-    ErrorInterceptorHandler handler,
-  ) async {
+  Future<void> _replay(RequestOptions options, ErrorInterceptorHandler handler) async {
     try {
       final response = await dio.fetch<dynamic>(options);
       handler.resolve(response);

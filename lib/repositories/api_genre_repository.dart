@@ -4,10 +4,9 @@ import 'api_repository.dart';
 import 'book_repository.dart';
 import 'entity_repository.dart';
 
-class ApiGenreRepository extends ApiRepository<Genre, SimpleQuery>
-    implements GenreRepository {
+class ApiGenreRepository extends ApiRepository<Genre, SimpleQuery> implements GenreRepository {
   ApiGenreRepository({required super.dio, required this.books})
-      : super(resource: 'genres', cacheAll: true);
+    : super(resource: 'genres', cacheAll: true);
 
   final BookRepository books;
 
@@ -22,13 +21,13 @@ class ApiGenreRepository extends ApiRepository<Genre, SimpleQuery>
 
   @override
   Map<String, dynamic> queryOf(SimpleQuery query) => pagingQuery(
-        search: query.search,
-        sortField: query.sortField,
-        sortAscending: query.sortAscending,
-        page: query.page,
-        size: query.size,
-        includeDeleted: query.includeDeleted,
-      );
+    search: query.search,
+    sortField: query.sortField,
+    sortAscending: query.sortAscending,
+    page: query.page,
+    size: query.size,
+    includeDeleted: query.includeDeleted,
+  );
 
   @override
   Future<String?> deleteBlocker(int id, {required bool permanent}) async {

@@ -41,31 +41,29 @@ class ServerException extends ApiException {
 }
 
 ApiException mapHttpError(int status, dynamic body) {
-  final message = (body is Map && body['message'] is String)
-      ? body['message'] as String
-      : null;
+  final message = (body is Map && body['message'] is String) ? body['message'] as String : null;
 
   return switch (status) {
     401 => UnauthorizedException(message ?? 'Требуется вход в систему.'),
     403 => ForbiddenException(
-        message == null
-            ? 'Недостаточно прав для этого действия.'
-            : 'Недостаточно прав для этого действия. ${message.endsWith('.') ? message : '$message.'}',
-      ),
+      message == null
+          ? 'Недостаточно прав для этого действия.'
+          : 'Недостаточно прав для этого действия. ${message.endsWith('.') ? message : '$message.'}',
+    ),
     404 => NotFoundException(message ?? 'Запись не найдена.'),
     409 => ConflictException(message ?? 'Операция невозможна.'),
     422 => ValidationException(
-        message ?? 'Ошибка валидации',
-        (body is Map && body['errors'] is Map)
-            ? (body['errors'] as Map).map((k, v) => MapEntry('$k', '$v'))
-            : const {},
-      ),
+      message ?? 'Ошибка валидации',
+      (body is Map && body['errors'] is Map)
+          ? (body['errors'] as Map).map((k, v) => MapEntry('$k', '$v'))
+          : const {},
+    ),
     _ => ServerException(
-        message ??
-            (status >= 500
-                ? 'Ошибка на сервере. Попробуйте позже.'
-                : 'Неизвестная ошибка (код $status).'),
-      ),
+      message ??
+          (status >= 500
+              ? 'Ошибка на сервере. Попробуйте позже.'
+              : 'Неизвестная ошибка (код $status).'),
+    ),
   };
 }
 
@@ -81,14 +79,14 @@ ApiException mapDioError(DioException e) {
   return switch (e.type) {
     DioExceptionType.connectionTimeout ||
     DioExceptionType.sendTimeout ||
-    DioExceptionType.receiveTimeout =>
-      const NetworkException('Сервер не ответил вовремя.'),
+    DioExceptionType.receiveTimeout => const NetworkException('Сервер не ответил вовремя.'),
     DioExceptionType.connectionError => const NetworkException(
-        'Не удалось соединиться с сервером. '
-        'Если сервер запущен, откройте консоль браузера и проверьте наличие ошибки CORS.',
-      ),
-    DioExceptionType.badCertificate =>
-      const NetworkException('Не удалось установить защищённое соединение.'),
+      'Не удалось соединиться с сервером. '
+      'Если сервер запущен, откройте консоль браузера и проверьте наличие ошибки CORS.',
+    ),
+    DioExceptionType.badCertificate => const NetworkException(
+      'Не удалось установить защищённое соединение.',
+    ),
     DioExceptionType.cancel => const CancelledException(),
     _ => const ServerException(),
   };
@@ -101,10 +99,7 @@ ValidationException _renamed(ValidationException e, Map<String, String> keys) {
   });
 }
 
-Future<T> guard<T>(
-  Future<T> Function() action, {
-  Map<String, String> fieldKeys = const {},
-}) async {
+Future<T> guard<T>(Future<T> Function() action, {Map<String, String> fieldKeys = const {}}) async {
   try {
     return await action();
   } on DioException catch (e) {

@@ -1,4 +1,3 @@
-
 import '../core/api_exceptions.dart';
 import '../models/book.dart';
 import '../models/book_query.dart';
@@ -6,8 +5,7 @@ import '../models/json_helpers.dart';
 import 'api_repository.dart';
 import 'book_repository.dart';
 
-class ApiBookRepository extends ApiRepository<Book, BookQuery>
-    implements BookRepository {
+class ApiBookRepository extends ApiRepository<Book, BookQuery> implements BookRepository {
   ApiBookRepository({required super.dio}) : super(resource: 'books');
 
   @override
@@ -42,11 +40,7 @@ class ApiBookRepository extends ApiRepository<Book, BookQuery>
     return guard(() async {
       final response = await dio.get<dynamic>(
         '/$resource',
-        queryParameters: {
-          ...filter,
-          'size': 1,
-          if (includeDeleted) 'includeDeleted': 'true',
-        },
+        queryParameters: {...filter, 'size': 1, if (includeDeleted) 'includeDeleted': 'true'},
       );
       return jsonInt(jsonMap(response.data)['total']);
     });

@@ -73,10 +73,16 @@ void main() {
       expect(find.text('Вход в систему'), findsNothing);
       expect(find.text('Идиот'), findsWidgets);
       expect(find.textContaining('Здравствуйте'), findsNothing);
-      expect(find.text('Преступление и наказание'), findsNothing, reason: 'параметры поиска сохранились');
+      expect(
+        find.text('Преступление и наказание'),
+        findsNothing,
+        reason: 'параметры поиска сохранились',
+      );
     });
 
-    testWidgets('после входа без адреса возврата открывается главная с именем в шапке', (tester) async {
+    testWidgets('после входа без адреса возврата открывается главная с именем в шапке', (
+      tester,
+    ) async {
       await _open(tester, server, location: '/login');
 
       await _login(tester, 'reader', 'reader123');
@@ -212,7 +218,9 @@ void main() {
       expect(find.byType(Checkbox), findsNothing);
     });
 
-    testWidgets('библиотекарь видит изменение и мягкое удаление, но не удаление навсегда', (tester) async {
+    testWidgets('библиотекарь видит изменение и мягкое удаление, но не удаление навсегда', (
+      tester,
+    ) async {
       await _open(tester, server, user: 'librarian', location: '/genres');
 
       expect(find.byIcon(Icons.add), findsOneWidget);
@@ -236,7 +244,9 @@ void main() {
   });
 
   group('Защита маршрутов', () {
-    testWidgets('читатель на адресе администратора видит экран отказа без запроса данных', (tester) async {
+    testWidgets('читатель на адресе администратора видит экран отказа без запроса данных', (
+      tester,
+    ) async {
       await _open(tester, server, user: 'reader', location: '/admin/users');
 
       expect(find.text('Доступ запрещён'), findsOneWidget);
@@ -294,13 +304,19 @@ void main() {
       expect(find.byKey(const ValueKey('my-loan-1')), findsOneWidget);
       expect(find.byKey(const ValueKey('my-loan-2')), findsNothing, reason: 'чужая выдача');
       expect(
-        find.descendant(of: find.byKey(const ValueKey('my-loan-1')), matching: find.text('Продлить')),
+        find.descendant(
+          of: find.byKey(const ValueKey('my-loan-1')),
+          matching: find.text('Продлить'),
+        ),
         findsNothing,
         reason: 'просроченную продлить нельзя',
       );
 
       await tester.tap(
-        find.descendant(of: find.byKey(const ValueKey('my-loan-3')), matching: find.text('Продлить')),
+        find.descendant(
+          of: find.byKey(const ValueKey('my-loan-3')),
+          matching: find.text('Продлить'),
+        ),
       );
       await tester.pumpAndSettle();
 
@@ -313,7 +329,10 @@ void main() {
       expect(find.byKey(const ValueKey('desk-loan-3')), findsOneWidget);
 
       await tester.tap(
-        find.descendant(of: find.byKey(const ValueKey('desk-loan-3')), matching: find.text('Принять')),
+        find.descendant(
+          of: find.byKey(const ValueKey('desk-loan-3')),
+          matching: find.text('Принять'),
+        ),
       );
       await tester.pumpAndSettle();
 
@@ -339,10 +358,8 @@ void main() {
     testWidgets('статистика администратора считается по данным сервера', (tester) async {
       await _open(tester, server, user: 'admin', location: '/admin/stats');
 
-      Finder number(String label, String value) => find.descendant(
-            of: find.byKey(ValueKey('stat-$label')),
-            matching: find.text(value),
-          );
+      Finder number(String label, String value) =>
+          find.descendant(of: find.byKey(ValueKey('stat-$label')), matching: find.text(value));
       expect(number('Книги', '4'), findsOneWidget);
       expect(number('Выдано сейчас', '2'), findsOneWidget);
       expect(number('Просрочено', '1'), findsOneWidget);
@@ -351,31 +368,37 @@ void main() {
   });
 
   group('Жизненный цикл сессии', () {
-    testWidgets('нерабочий токен обновления: чистый выход, один запрос обновления, повторный вход возвращает на страницу',
-        (tester) async {
-      await _open(tester, server, user: 'reader', location: '/books');
-      expect(find.text('Идиот'), findsWidgets);
+    testWidgets(
+      'нерабочий токен обновления: чистый выход, один запрос обновления, повторный вход возвращает на страницу',
+      (tester) async {
+        await _open(tester, server, user: 'reader', location: '/books');
+        expect(find.text('Идиот'), findsWidgets);
 
-      server.expireAccess();
-      server.refreshRejected = true;
-      await tester.tap(find.descendant(of: find.byType(AppBar), matching: find.text('Авторы')));
-      await tester.pumpAndSettle();
+        server.expireAccess();
+        server.refreshRejected = true;
+        await tester.tap(
+          find.descendant(of: find.byType(NavigationRail), matching: find.text('Авторы')),
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.text('Вход в систему'), findsOneWidget);
-      expect(find.textContaining('сервер не принял токен'), findsOneWidget);
-      expect(server.refreshCount, 1, reason: 'цикла запросов нет');
-      final prefs = await SharedPreferences.getInstance();
-      expect(prefs.getString(kAccessKey), isNull);
+        expect(find.text('Вход в систему'), findsOneWidget);
+        expect(find.textContaining('сервер не принял токен'), findsOneWidget);
+        expect(server.refreshCount, 1, reason: 'цикла запросов нет');
+        final prefs = await SharedPreferences.getInstance();
+        expect(prefs.getString(kAccessKey), isNull);
 
-      await _login(tester, 'reader', 'reader123');
-      expect(find.text('Достоевский Ф. М.'), findsWidgets, reason: 'возврат на /authors');
-    });
+        await _login(tester, 'reader', 'reader123');
+        expect(find.text('Достоевский Ф. М.'), findsWidgets, reason: 'возврат на /authors');
+      },
+    );
 
     testWidgets('истёкший токен обновляется незаметно для пользователя', (tester) async {
       await _open(tester, server, user: 'reader', location: '/books');
 
       server.expireAccess();
-      await tester.tap(find.descendant(of: find.byType(AppBar), matching: find.text('Авторы')));
+      await tester.tap(
+        find.descendant(of: find.byType(NavigationRail), matching: find.text('Авторы')),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Достоевский Ф. М.'), findsWidgets);
@@ -383,7 +406,9 @@ void main() {
       expect(server.refreshCount, 1);
     });
 
-    testWidgets('предупреждение за 30 секунд, продление кнопкой и выход после трёх минут', (tester) async {
+    testWidgets('предупреждение за 30 секунд, продление кнопкой и выход после трёх минут', (
+      tester,
+    ) async {
       useLargeScreen(tester);
       var clock = DateTime(2026, 10, 29, 9);
       final repos = await signedIn(tester, server, user: 'reader', now: () => clock);
@@ -434,7 +459,9 @@ void main() {
       expect(find.text('Вход в систему'), findsOneWidget);
     });
 
-    testWidgets('предельная длительность сессии прерывает работу активного пользователя', (tester) async {
+    testWidgets('предельная длительность сессии прерывает работу активного пользователя', (
+      tester,
+    ) async {
       useLargeScreen(tester);
       var clock = DateTime(2026, 10, 29, 9);
       final repos = await signedIn(tester, server, user: 'admin', now: () => clock);
@@ -453,7 +480,9 @@ void main() {
   });
 
   group('Подмена роли в localStorage', () {
-    testWidgets('кнопки появляются, но сервер отвечает 403 и интерфейс объясняет причину', (tester) async {
+    testWidgets('кнопки появляются, но сервер отвечает 403 и интерфейс объясняет причину', (
+      tester,
+    ) async {
       useLargeScreen(tester);
       await signedIn(tester, server, user: 'reader');
       final prefs = await SharedPreferences.getInstance();
@@ -477,7 +506,11 @@ void main() {
       await tester.pumpWidget(LibraryApp(repositories: tampered, initialLocation: '/genres'));
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.add), findsOneWidget, reason: 'интерфейс считает читателя администратором');
+      expect(
+        find.byIcon(Icons.add),
+        findsOneWidget,
+        reason: 'интерфейс считает читателя администратором',
+      );
       expect(find.byIcon(Icons.delete_forever), findsWidgets);
 
       await tester.tap(find.byIcon(Icons.add));
@@ -488,7 +521,10 @@ void main() {
 
       expect(find.textContaining('Недостаточно прав для этого действия'), findsOneWidget);
       expect(server.data['genres'], hasLength(2));
-      expect(server.calls('POST', '/genres').single.headers['Authorization'], startsWith('Bearer access-'));
+      expect(
+        server.calls('POST', '/genres').single.headers['Authorization'],
+        startsWith('Bearer access-'),
+      );
     });
   });
 }

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../repositories/stats_repository.dart';
 import '../state/paged_list_notifier.dart';
 import '../widgets/library_scaffold.dart';
+import '../widgets/responsive_grid.dart';
 import '../widgets/state_views.dart';
 
 /// Статистика библиотеки. Раздел администратора.
@@ -70,25 +71,22 @@ class _StatsScreenState extends State<StatsScreen> {
           alignment: Alignment.topCenter,
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 960),
-            child: Wrap(
-              spacing: 12,
-              runSpacing: 12,
+            child: ResponsiveGrid(
+              minTileWidth: 220,
               children: [
                 for (final tile in tiles)
-                  SizedBox(
-                    width: 200,
-                    child: Card(
-                      key: ValueKey('stat-${tile.$1}'),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          children: [
-                            Icon(tile.$3, size: 28),
-                            const SizedBox(height: 8),
-                            Text(tile.$2, style: Theme.of(context).textTheme.headlineMedium),
-                            Text(tile.$1, textAlign: TextAlign.center),
-                          ],
-                        ),
+                  Card(
+                    key: ValueKey('stat-${tile.$1}'),
+                    margin: EdgeInsets.zero,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          Icon(tile.$3, size: 28),
+                          const SizedBox(height: 8),
+                          Text(tile.$2, style: Theme.of(context).textTheme.headlineMedium),
+                          Text(tile.$1, textAlign: TextAlign.center),
+                        ],
                       ),
                     ),
                   ),

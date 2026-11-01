@@ -7,6 +7,7 @@ import '../models/simple_query.dart';
 import '../repositories/entity_repository.dart';
 import '../state/paged_list_notifier.dart';
 import '../validation/validators.dart';
+import '../widgets/action_card.dart';
 import '../widgets/confirm_dialog.dart';
 import '../widgets/library_scaffold.dart';
 import '../widgets/state_views.dart';
@@ -41,8 +42,10 @@ class _MyLoansScreenState extends State<MyLoansScreen> {
     final repository = context.read<LoanRepository>();
     try {
       final page = await repository.find(
-        SimpleQuery.initial(sortFields: kLoanSortFields, defaultSort: 'issuedAt')
-            .copyWith(size: 50, sortAscending: false),
+        SimpleQuery.initial(
+          sortFields: kLoanSortFields,
+          defaultSort: 'issuedAt',
+        ).copyWith(size: 50, sortAscending: false),
       );
       if (mounted) setState(() => _loans = page.items);
     } catch (e) {
@@ -60,11 +63,7 @@ class _MyLoansScreenState extends State<MyLoansScreen> {
       await _load();
     } catch (e) {
       if (mounted) {
-        await showNotice(
-          context,
-          title: 'Продлить не удалось',
-          message: describeError(e),
-        );
+        await showNotice(context, title: 'Продлить не удалось', message: describeError(e));
       }
     } finally {
       if (mounted) setState(() => _busyId = null);
@@ -74,10 +73,7 @@ class _MyLoansScreenState extends State<MyLoansScreen> {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<AuthNotifier>().user;
-    return LibraryScaffold(
-      title: 'Мои выдачи',
-      body: _body(user?.readerId),
-    );
+    return LibraryScaffold(title: 'Мои выдачи', body: _body(user?.readerId));
   }
 
   Widget _body(int? readerId) {
@@ -102,35 +98,31 @@ class _MyLoansScreenState extends State<MyLoansScreen> {
             final loan = loans[index];
             // Продлевать можно только действующую выдачу: у просроченной книгу надо вернуть.
             final open = !loan.isClosed && !loan.isDeleted && loan.status == LoanStatus.active;
-            return Card(
-              child: ListTile(
-                key: ValueKey('my-loan-${loan.id}'),
-                leading: Icon(
-                  loan.status == LoanStatus.overdue
-                      ? Icons.warning_amber
-                      : loan.isClosed
-                          ? Icons.check_circle_outline
-                          : Icons.menu_book,
-                ),
-                title: Text(loan.bookTitle),
-                subtitle: Text(
+            return ActionCard(
+              key: ValueKey('my-loan-${loan.id}'),
+              leading: Icon(
+                loan.status == LoanStatus.overdue
+                    ? Icons.warning_amber
+                    : loan.isClosed
+                    ? Icons.check_circle_outline
+                    : Icons.menu_book,
+              ),
+              title: loan.bookTitle,
+              subtitle:
                   'Выдана ${_date(loan.issuedAt)} · вернуть до ${_date(loan.dueAt)}\n'
                   '${loan.status.label}${loan.isClosed ? ' ${_date(loan.returnedAt)}' : ''}',
-                ),
-                isThreeLine: true,
-                trailing: open
-                    ? OutlinedButton(
-                        onPressed: _busyId == null ? () => _extend(loan) : null,
-                        child: _busyId == loan.id
-                            ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2),
-                              )
-                            : const Text('Продлить'),
-                      )
-                    : null,
-              ),
+              action: open
+                  ? OutlinedButton(
+                      onPressed: _busyId == null ? () => _extend(loan) : null,
+                      child: _busyId == loan.id
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Text('Продлить'),
+                    )
+                  : null,
             );
           },
         ),

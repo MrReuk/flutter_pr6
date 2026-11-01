@@ -25,12 +25,7 @@ import 'state/reference_notifier.dart';
 import 'widgets/session_guard.dart';
 
 class LibraryApp extends StatefulWidget {
-  const LibraryApp({
-    super.key,
-    required this.repositories,
-    this.initialLocation = '/',
-    this.clock,
-  });
+  const LibraryApp({super.key, required this.repositories, this.initialLocation = '/', this.clock});
 
   final AppRepositories repositories;
   final String initialLocation;
@@ -44,10 +39,7 @@ class LibraryApp extends StatefulWidget {
 
 class _LibraryAppState extends State<LibraryApp> {
   late final AuthNotifier _auth = widget.repositories.auth;
-  late final GoRouter _router = buildRouter(
-    auth: _auth,
-    initialLocation: widget.initialLocation,
-  );
+  late final GoRouter _router = buildRouter(auth: _auth, initialLocation: widget.initialLocation);
   int? _userId;
 
   @override
@@ -107,10 +99,7 @@ class _LibraryAppState extends State<LibraryApp> {
         ),
         ChangeNotifierProvider<PagedListNotifier<Genre, SimpleQuery>>(
           create: (_) => PagedListNotifier<Genre, SimpleQuery>(
-            initialQuery: SimpleQuery.initial(
-              sortFields: kGenreSortFields,
-              defaultSort: 'name',
-            ),
+            initialQuery: SimpleQuery.initial(sortFields: kGenreSortFields, defaultSort: 'name'),
             repository: repos.genres,
             idOf: (genre) => genre.id,
           ),
@@ -137,10 +126,7 @@ class _LibraryAppState extends State<LibraryApp> {
         ),
         ChangeNotifierProvider<PagedListNotifier<Loan, SimpleQuery>>(
           create: (_) => PagedListNotifier<Loan, SimpleQuery>(
-            initialQuery: SimpleQuery.initial(
-              sortFields: kLoanSortFields,
-              defaultSort: 'issuedAt',
-            ),
+            initialQuery: SimpleQuery.initial(sortFields: kLoanSortFields, defaultSort: 'issuedAt'),
             repository: repos.loans,
             idOf: (loan) => loan.id,
           ),
@@ -165,17 +151,12 @@ class _LibraryAppState extends State<LibraryApp> {
           useMaterial3: true,
         ),
         darkTheme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.indigo,
-            brightness: Brightness.dark,
-          ),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo, brightness: Brightness.dark),
           useMaterial3: true,
         ),
         routerConfig: _router,
-        builder: (context, child) => SessionGuard(
-          now: widget.clock,
-          child: child ?? const SizedBox.shrink(),
-        ),
+        builder: (context, child) =>
+            SessionGuard(now: widget.clock, child: child ?? const SizedBox.shrink()),
       ),
     );
   }

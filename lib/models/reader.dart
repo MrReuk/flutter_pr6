@@ -6,12 +6,7 @@ class LibraryCard {
   final DateTime? issuedAt;
   final DateTime? expiresAt;
 
-  const LibraryCard({
-    required this.id,
-    required this.number,
-    this.issuedAt,
-    this.expiresAt,
-  });
+  const LibraryCard({required this.id, required this.number, this.issuedAt, this.expiresAt});
 
   factory LibraryCard.fromJson(Map<String, dynamic> json) {
     return LibraryCard(
@@ -57,11 +52,7 @@ class Reader {
     );
   }
 
-  Map<String, dynamic> toJson() => {
-        'fullName': fullName,
-        'email': email,
-        'phone': phone,
-      };
+  Map<String, dynamic> toJson() => {'fullName': fullName, 'email': email, 'phone': phone};
 
   bool get isDeleted => deletedAt != null;
 

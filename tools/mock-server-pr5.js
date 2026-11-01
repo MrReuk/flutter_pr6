@@ -41,7 +41,9 @@ function arg(name, fallback) {
 }
 
 const PORT = Number(arg('port', 8080));
-const ORIGIN = arg('origin', '*');
+// Разрешённые источники страницы. Несколько адресов через запятую (ПР6: локальная
+// сборка и страница на GitHub Pages). «*» разрешает любой.
+const ORIGINS = arg('origin', '*').split(',').map((o) => o.trim()).filter(Boolean);
 const SECRET = 'учебный-ключ-не-для-продакшена';
 const ACCESS_TTL = Number(arg('ttl', 900));      // секунд
 const REFRESH_TTL = 60 * 60 * 24 * 7;
@@ -426,8 +428,17 @@ function validate(collection, body, id = null) {
 
 // ──────────────────────────── HTTP-обвязка ────────────────────────────
 
-function cors(res) {
-  res.setHeader('Access-Control-Allow-Origin', ORIGIN);
+function allowedOrigin(req) {
+  if (ORIGINS.includes('*')) return '*';
+  const origin = req && req.headers ? req.headers.origin : undefined;
+  return origin && ORIGINS.includes(origin) ? origin : ORIGINS[0];
+}
+
+function cors(res, req) {
+  res.setHeader('Access-Control-Allow-Origin', allowedOrigin(req || res.req));
+  // Chrome спрашивает разрешения, когда страница из интернета (GitHub Pages)
+  // обращается к серверу на этом же компьютере.
+  res.setHeader('Access-Control-Allow-Private-Network', 'true');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Access-Control-Max-Age', '86400');
@@ -890,7 +901,7 @@ server.listen(PORT, () => {
   console.log('');
   console.log('  Учебное API «Библиотека»');
   console.log(`  Адрес:              http://localhost:${PORT}/api`);
-  console.log(`  Разрешённый источник: ${ORIGIN}`);
+  console.log(`  Разрешённые источники: ${ORIGINS.join(", ")}`);
   console.log(`  Срок жизни токена:  ${ACCESS_TTL} с`);
   console.log('');
   console.log('  Учётные записи:  admin/admin123   librarian/librarian123   reader/reader123');

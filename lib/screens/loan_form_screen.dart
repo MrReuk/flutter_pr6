@@ -25,11 +25,7 @@ class LoanFormScreen extends StatelessWidget {
       needsRefs: true,
       needsLinks: true,
       loadItem: null,
-      initialValues: (loan) => {
-        'readerId': null,
-        'bookId': null,
-        'days': '14',
-      },
+      initialValues: (loan) => {'readerId': null, 'bookId': null, 'days': '14'},
       fields: (loan) => [
         FieldSpec.dropdown(
           key: 'readerId',

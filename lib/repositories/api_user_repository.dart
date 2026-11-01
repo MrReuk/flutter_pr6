@@ -35,10 +35,7 @@ class ApiUserRepository implements UserRepository {
   Future<AppUser> changeRole(int id, Role role) {
     return guard(() async {
       try {
-        final response = await dio.patch<dynamic>(
-          '/users/$id',
-          data: {'role': role.code},
-        );
+        final response = await dio.patch<dynamic>('/users/$id', data: {'role': role.code});
         return AppUser.fromJson(jsonMap(response.data));
       } on DioException catch (e) {
         if (e.error is NotFoundException && '${e.error}'.contains('Ресурс не найден')) {

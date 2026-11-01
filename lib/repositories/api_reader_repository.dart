@@ -3,8 +3,7 @@ import '../models/simple_query.dart';
 import 'api_repository.dart';
 import 'entity_repository.dart';
 
-class ApiReaderRepository extends ApiRepository<Reader, SimpleQuery>
-    implements ReaderRepository {
+class ApiReaderRepository extends ApiRepository<Reader, SimpleQuery> implements ReaderRepository {
   ApiReaderRepository({required super.dio}) : super(resource: 'readers');
 
   @override
@@ -18,11 +17,11 @@ class ApiReaderRepository extends ApiRepository<Reader, SimpleQuery>
 
   @override
   Map<String, dynamic> queryOf(SimpleQuery query) => pagingQuery(
-        search: query.search,
-        sortField: query.sortField,
-        sortAscending: query.sortAscending,
-        page: query.page,
-        size: query.size,
-        includeDeleted: query.includeDeleted,
-      );
+    search: query.search,
+    sortField: query.sortField,
+    sortAscending: query.sortAscending,
+    page: query.page,
+    size: query.size,
+    includeDeleted: query.includeDeleted,
+  );
 }

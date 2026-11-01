@@ -14,11 +14,7 @@ class PageResult<T> {
     required this.total,
   });
 
-  PageResult.empty()
-      : items = <T>[],
-        page = 1,
-        size = kDefaultPageSize,
-        total = 0;
+  PageResult.empty() : items = <T>[], page = 1, size = kDefaultPageSize, total = 0;
 
   factory PageResult.slice(List<T> rows, {required int page, required int size}) {
     final total = rows.length;
@@ -26,12 +22,7 @@ class PageResult<T> {
     final current = page < 1 ? 1 : (page > pages ? pages : page);
     final from = (current - 1) * size;
     final to = from + size > total ? total : from + size;
-    return PageResult(
-      items: rows.sublist(from, to),
-      page: current,
-      size: size,
-      total: total,
-    );
+    return PageResult(items: rows.sublist(from, to), page: current, size: size, total: total);
   }
 
   int get totalPages => total == 0 ? 1 : (total / size).ceil();

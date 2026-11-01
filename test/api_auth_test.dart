@@ -45,10 +45,7 @@ void main() {
     test('без входа запрос уходит без заголовка и получает 401', () async {
       final repos = await makeRepositories(server, user: null);
 
-      await expectLater(
-        repos.books.find(const BookQuery()),
-        throwsA(isA<UnauthorizedException>()),
-      );
+      await expectLater(repos.books.find(const BookQuery()), throwsA(isA<UnauthorizedException>()));
 
       expect(server.calls('GET', '/books').single.headers.containsKey('Authorization'), isFalse);
     });
@@ -64,9 +61,16 @@ void main() {
 
       expect(page.items, isNotEmpty);
       expect(server.refreshCount, 1);
-      expect(server.calls('GET', '/books'), hasLength(2), reason: 'первый запрос получил 401, второй 200');
+      expect(
+        server.calls('GET', '/books'),
+        hasLength(2),
+        reason: 'первый запрос получил 401, второй 200',
+      );
       expect(repos.auth.accessToken, isNot(oldToken));
-      expect(server.calls('GET', '/books').last.headers['Authorization'], 'Bearer ${repos.auth.accessToken}');
+      expect(
+        server.calls('GET', '/books').last.headers['Authorization'],
+        'Bearer ${repos.auth.accessToken}',
+      );
       expect(repos.auth.isAuthenticated, isTrue);
     });
 
@@ -89,9 +93,7 @@ void main() {
       final results = await Future.wait<Object>([
         repos.books.find(const BookQuery()),
         repos.authors.find(const AuthorQuery()),
-        repos.loans.find(
-          SimpleQuery.initial(sortFields: kLoanSortFields, defaultSort: 'issuedAt'),
-        ),
+        repos.loans.find(SimpleQuery.initial(sortFields: kLoanSortFields, defaultSort: 'issuedAt')),
       ]);
 
       expect(results, hasLength(3));
@@ -105,23 +107,21 @@ void main() {
       server.expireAccess();
       server.refreshRejected = true;
 
-      await expectLater(
-        repos.books.find(const BookQuery()),
-        throwsA(isA<UnauthorizedException>()),
-      );
+      await expectLater(repos.books.find(const BookQuery()), throwsA(isA<UnauthorizedException>()));
 
       expect(repos.auth.isAuthenticated, isFalse);
       expect(repos.auth.lastEnd, SessionEnd.tokenRejected);
       expect(prefs.getString(kAccessKey), isNull);
       expect(prefs.getString(kRefreshKey), isNull);
       expect(server.refreshCount, 1);
-      expect(server.calls('GET', '/books'), hasLength(1), reason: 'запрос не повторяется бесконечно');
+      expect(
+        server.calls('GET', '/books'),
+        hasLength(1),
+        reason: 'запрос не повторяется бесконечно',
+      );
 
       // Следующий запрос уже без сессии: обновлять нечего, сеть не нагружается.
-      await expectLater(
-        repos.books.find(const BookQuery()),
-        throwsA(isA<UnauthorizedException>()),
-      );
+      await expectLater(repos.books.find(const BookQuery()), throwsA(isA<UnauthorizedException>()));
       expect(server.refreshCount, 1);
     });
 
@@ -129,10 +129,7 @@ void main() {
       final repos = await makeRepositories(server, user: 'reader');
 
       server.rejectAllAccess = true;
-      await expectLater(
-        repos.books.find(const BookQuery()),
-        throwsA(isA<UnauthorizedException>()),
-      );
+      await expectLater(repos.books.find(const BookQuery()), throwsA(isA<UnauthorizedException>()));
 
       expect(server.refreshCount, 1);
       expect(server.calls('GET', '/books'), hasLength(2));
@@ -144,10 +141,7 @@ void main() {
 
       server.expireAccess();
       server.refreshUnreachable = true;
-      await expectLater(
-        repos.books.find(const BookQuery()),
-        throwsA(isA<NetworkException>()),
-      );
+      await expectLater(repos.books.find(const BookQuery()), throwsA(isA<NetworkException>()));
 
       expect(repos.auth.isAuthenticated, isTrue, reason: 'сеть могла просто пропасть');
       server.refreshUnreachable = false;

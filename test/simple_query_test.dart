@@ -2,11 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:library_app/models/simple_query.dart';
 
 void main() {
-  SimpleQuery parse(Map<String, String> params) => SimpleQuery.fromParams(
-        params,
-        sortFields: kReaderSortFields,
-        defaultSort: 'fullName',
-      );
+  SimpleQuery parse(Map<String, String> params) =>
+      SimpleQuery.fromParams(params, sortFields: kReaderSortFields, defaultSort: 'fullName');
 
   test('Параметры адреса разбираются в условия отбора', () {
     final q = parse({
@@ -43,10 +40,7 @@ void main() {
   });
 
   test('Значения по умолчанию не попадают в адрес', () {
-    final q = SimpleQuery.initial(
-      sortFields: kReaderSortFields,
-      defaultSort: 'fullName',
-    );
+    final q = SimpleQuery.initial(sortFields: kReaderSortFields, defaultSort: 'fullName');
 
     expect(q.toLocation('/readers'), '/readers');
   });

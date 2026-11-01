@@ -34,10 +34,10 @@ class _AuthorListScreenState extends State<AuthorListScreen> {
   void _go(AuthorQuery next) => context.go(next.toLocation('/authors'));
 
   AuthorQuery get _resetQuery => AuthorQuery(
-        size: _query.size,
-        sortField: _query.sortField,
-        sortAscending: _query.sortAscending,
-      );
+    size: _query.size,
+    sortField: _query.sortField,
+    sortAscending: _query.sortAscending,
+  );
 
   @override
   void initState() {
@@ -78,8 +78,7 @@ class _AuthorListScreenState extends State<AuthorListScreen> {
     final confirmed = await confirmAction(
       context,
       title: 'Удалить выбранные записи?',
-      message:
-          'Будет удалено записей: ${notifier.selected.length}. Их можно восстановить.',
+      message: 'Будет удалено записей: ${notifier.selected.length}. Их можно восстановить.',
     );
     if (!confirmed) return;
     final summary = await notifier.deleteSelected();
@@ -135,6 +134,7 @@ class _AuthorListScreenState extends State<AuthorListScreen> {
               error: notifier.error,
               result: notifier.result,
               onRetry: notifier.load,
+              offline: notifier.offline,
               emptyMessage: 'Авторы не найдены. Измените поиск или фильтры.',
               onReset: q.search.isNotEmpty || q.activeFilterCount > 0
                   ? () => _go(_resetQuery)
@@ -167,8 +167,7 @@ class _AuthorListScreenState extends State<AuthorListScreen> {
               onSort: (field) => _go(
                 _query.copyWith(
                   sortField: field,
-                  sortAscending:
-                      field == _query.sortField ? !_query.sortAscending : true,
+                  sortAscending: field == _query.sortField ? !_query.sortAscending : true,
                 ),
               ),
               onOpen: (a) => _open('/authors/${a.id}'),

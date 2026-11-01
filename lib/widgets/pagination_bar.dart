@@ -26,22 +26,27 @@ class PaginationBar extends StatelessWidget {
         spacing: 16,
         runSpacing: 4,
         children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
+          Wrap(
+            spacing: 16,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Text('Всего записей: ${result.total}'),
-              const SizedBox(width: 16),
-              const Text('На странице:'),
-              const SizedBox(width: 8),
-              DropdownButton<int>(
-                value: sizeValue,
-                items: [
-                  for (final size in kPageSizes)
-                    DropdownMenuItem<int>(value: size, child: Text('$size')),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('На странице:'),
+                  const SizedBox(width: 8),
+                  DropdownButton<int>(
+                    value: sizeValue,
+                    items: [
+                      for (final size in kPageSizes)
+                        DropdownMenuItem<int>(value: size, child: Text('$size')),
+                    ],
+                    onChanged: (value) {
+                      if (value != null) onSize(value);
+                    },
+                  ),
                 ],
-                onChanged: (value) {
-                  if (value != null) onSize(value);
-                },
               ),
             ],
           ),
@@ -58,7 +63,13 @@ class PaginationBar extends StatelessWidget {
                 icon: const Icon(Icons.chevron_left),
                 onPressed: result.hasPrevious ? () => onPage(result.page - 1) : null,
               ),
-              Text('Страница ${result.page} из $totalPages'),
+              Flexible(
+                child: Text(
+                  'Страница ${result.page} из $totalPages',
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                ),
+              ),
               IconButton(
                 tooltip: 'Следующая',
                 icon: const Icon(Icons.chevron_right),

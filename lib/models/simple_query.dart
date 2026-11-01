@@ -24,15 +24,8 @@ class SimpleQuery {
     this.includeDeleted = false,
   });
 
-  factory SimpleQuery.initial({
-    required List<String> sortFields,
-    required String defaultSort,
-  }) {
-    return SimpleQuery(
-      sortFields: sortFields,
-      defaultSort: defaultSort,
-      sortField: defaultSort,
-    );
+  factory SimpleQuery.initial({required List<String> sortFields, required String defaultSort}) {
+    return SimpleQuery(sortFields: sortFields, defaultSort: defaultSort, sortField: defaultSort);
   }
 
   factory SimpleQuery.fromParams(
@@ -54,8 +47,7 @@ class SimpleQuery {
     );
   }
 
-  int get activeFilterCount =>
-      (filter.isNotEmpty ? 1 : 0) + (includeDeleted ? 1 : 0);
+  int get activeFilterCount => (filter.isNotEmpty ? 1 : 0) + (includeDeleted ? 1 : 0);
 
   Map<String, String> toParams() {
     return {
@@ -71,10 +63,7 @@ class SimpleQuery {
 
   String toLocation(String path) {
     final params = toParams();
-    return Uri(
-      path: path,
-      queryParameters: params.isEmpty ? null : params,
-    ).toString();
+    return Uri(path: path, queryParameters: params.isEmpty ? null : params).toString();
   }
 
   SimpleQuery copyWith({
@@ -122,15 +111,8 @@ class SimpleQuery {
           other.includeDeleted == includeDeleted;
 
   @override
-  int get hashCode => Object.hash(
-        search,
-        filter,
-        sortField,
-        sortAscending,
-        page,
-        size,
-        includeDeleted,
-      );
+  int get hashCode =>
+      Object.hash(search, filter, sortField, sortAscending, page, size, includeDeleted);
 }
 
 const List<String> kGenreSortFields = ['name'];

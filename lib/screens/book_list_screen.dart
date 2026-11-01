@@ -37,10 +37,10 @@ class _BookListScreenState extends State<BookListScreen> {
   void _go(BookQuery next) => context.go(next.toLocation('/books'));
 
   BookQuery get _resetQuery => BookQuery(
-        size: _query.size,
-        sortField: _query.sortField,
-        sortAscending: _query.sortAscending,
-      );
+    size: _query.size,
+    sortField: _query.sortField,
+    sortAscending: _query.sortAscending,
+  );
 
   @override
   void initState() {
@@ -82,8 +82,7 @@ class _BookListScreenState extends State<BookListScreen> {
     final confirmed = await confirmAction(
       context,
       title: 'Удалить выбранные записи?',
-      message:
-          'Будет удалено записей: ${notifier.selected.length}. Их можно восстановить.',
+      message: 'Будет удалено записей: ${notifier.selected.length}. Их можно восстановить.',
     );
     if (!confirmed) return;
     final summary = await notifier.deleteSelected();
@@ -137,8 +136,7 @@ class _BookListScreenState extends State<BookListScreen> {
                 width: 110,
                 child: DebouncedTextField(
                   value: q.yearFrom?.toString() ?? '',
-                  onChanged: (text) =>
-                      _go(_query.copyWith(yearFrom: int.tryParse(text.trim()))),
+                  onChanged: (text) => _go(_query.copyWith(yearFrom: int.tryParse(text.trim()))),
                   keyboardType: TextInputType.number,
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
@@ -155,8 +153,7 @@ class _BookListScreenState extends State<BookListScreen> {
                 width: 110,
                 child: DebouncedTextField(
                   value: q.yearTo?.toString() ?? '',
-                  onChanged: (text) =>
-                      _go(_query.copyWith(yearTo: int.tryParse(text.trim()))),
+                  onChanged: (text) => _go(_query.copyWith(yearTo: int.tryParse(text.trim()))),
                   keyboardType: TextInputType.number,
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
@@ -174,8 +171,7 @@ class _BookListScreenState extends State<BookListScreen> {
                 children: [
                   Switch(
                     value: q.onlyAvailable,
-                    onChanged: (value) =>
-                        _go(_query.copyWith(onlyAvailable: value)),
+                    onChanged: (value) => _go(_query.copyWith(onlyAvailable: value)),
                   ),
                   const SizedBox(width: 8),
                   const Text('Только доступные'),
@@ -200,6 +196,7 @@ class _BookListScreenState extends State<BookListScreen> {
               error: notifier.error,
               result: notifier.result,
               onRetry: notifier.load,
+              offline: notifier.offline,
               emptyMessage: 'Книги не найдены. Измените поиск или фильтры.',
               onReset: q.search.isNotEmpty || q.activeFilterCount > 0
                   ? () => _go(_resetQuery)
@@ -232,6 +229,7 @@ class _BookListScreenState extends State<BookListScreen> {
                   label: 'Страниц',
                   sortField: 'pages',
                   numeric: true,
+                  hideBelow: 1100,
                   build: (b) => Text('${b.pages}'),
                 ),
                 TableColumnSpec<Book>(
@@ -250,8 +248,7 @@ class _BookListScreenState extends State<BookListScreen> {
               onSort: (field) => _go(
                 _query.copyWith(
                   sortField: field,
-                  sortAscending:
-                      field == _query.sortField ? !_query.sortAscending : true,
+                  sortAscending: field == _query.sortField ? !_query.sortAscending : true,
                 ),
               ),
               onOpen: (b) => _open('/books/${b.id}'),

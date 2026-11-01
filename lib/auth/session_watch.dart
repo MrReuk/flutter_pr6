@@ -20,12 +20,9 @@ typedef SessionStatus = ({SessionPhase phase, int secondsLeft});
 /// Считает, в какой фазе находится сессия. Не знает про таймеры и виджеты:
 /// время передаётся снаружи, поэтому логику легко проверить тестом.
 class SessionWatch {
-  SessionWatch({
-    required this.policy,
-    required DateTime startedAt,
-    DateTime? lastActivity,
-  })  : _startedAt = startedAt,
-        _lastActivity = lastActivity ?? startedAt;
+  SessionWatch({required this.policy, required DateTime startedAt, DateTime? lastActivity})
+    : _startedAt = startedAt,
+      _lastActivity = lastActivity ?? startedAt;
 
   final SessionPolicy policy;
   final DateTime _startedAt;

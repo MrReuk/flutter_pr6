@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../core/breakpoints.dart';
 import 'debounced_text_field.dart';
 
 class ListToolbar extends StatefulWidget {
@@ -41,14 +42,14 @@ class _ListToolbarState extends State<ListToolbar> {
     super.didChangeDependencies();
     if (!_initialized) {
       _initialized = true;
-      _open = widget.initiallyOpen || MediaQuery.sizeOf(context).width >= 900;
+      _open = widget.initiallyOpen || screenSizeOf(context) == ScreenSize.expanded;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final count = widget.activeFilterCount;
-    final narrow = MediaQuery.sizeOf(context).width < 600;
+    final narrow = screenSizeOf(context) == ScreenSize.compact;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
       child: Column(
@@ -73,11 +74,22 @@ class _ListToolbarState extends State<ListToolbar> {
                 const SizedBox(width: 8),
               ] else
                 const Spacer(),
-              OutlinedButton.icon(
-                onPressed: () => setState(() => _open = !_open),
-                icon: Icon(_open ? Icons.expand_less : Icons.tune),
-                label: Text(count > 0 ? 'Фильтры ($count)' : 'Фильтры'),
-              ),
+              if (narrow)
+                IconButton.outlined(
+                  tooltip: count > 0 ? 'Фильтры ($count)' : 'Фильтры',
+                  onPressed: () => setState(() => _open = !_open),
+                  icon: Badge(
+                    isLabelVisible: count > 0,
+                    label: Text('$count'),
+                    child: Icon(_open ? Icons.expand_less : Icons.tune),
+                  ),
+                )
+              else
+                OutlinedButton.icon(
+                  onPressed: () => setState(() => _open = !_open),
+                  icon: Icon(_open ? Icons.expand_less : Icons.tune),
+                  label: Text(count > 0 ? 'Фильтры ($count)' : 'Фильтры'),
+                ),
               if (widget.onAdd != null) ...[
                 const SizedBox(width: 8),
                 if (narrow)
@@ -98,9 +110,7 @@ class _ListToolbarState extends State<ListToolbar> {
           if (_open) ...[
             const SizedBox(height: 12),
             ConstrainedBox(
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.sizeOf(context).height * 0.4,
-              ),
+              constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.4),
               child: SingleChildScrollView(
                 child: Wrap(
                   spacing: 12,

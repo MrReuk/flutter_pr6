@@ -7,6 +7,7 @@ import '../auth/permissions.dart';
 import '../repositories/stats_repository.dart';
 import '../state/paged_list_notifier.dart';
 import '../widgets/library_scaffold.dart';
+import '../widgets/responsive_grid.dart';
 
 String _two(int value) => value.toString().padLeft(2, '0');
 
@@ -101,8 +102,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       : null,
                                   label: Text('Просрочено: ${_counts!.overdue}'),
                                 ),
-                              if (expires != null)
-                                Chip(label: Text('Сессия до ${_time(expires)}')),
+                              if (expires != null) Chip(label: Text('Сессия до ${_time(expires)}')),
                             ],
                           ),
                           if (_countsError != null) ...[
@@ -119,28 +119,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   const SizedBox(height: 16),
                   Text('Разделы', style: theme.textTheme.titleMedium),
                   const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
+                  ResponsiveGrid(
+                    minTileWidth: 240,
                     children: [
                       for (final item in tiles)
-                        SizedBox(
-                          width: 200,
-                          child: Card(
-                            clipBehavior: Clip.antiAlias,
-                            child: InkWell(
-                              onTap: () => context.go(item.path),
-                              child: Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Column(
-                                  children: [
-                                    Icon(item.icon, size: 36),
-                                    const SizedBox(height: 8),
-                                    Text(item.label, textAlign: TextAlign.center),
-                                  ],
-                                ),
-                              ),
-                            ),
+                        Card(
+                          margin: EdgeInsets.zero,
+                          clipBehavior: Clip.antiAlias,
+                          child: ListTile(
+                            key: ValueKey('tile-${item.path}'),
+                            leading: Icon(item.icon, size: 28),
+                            title: Text(item.label, maxLines: 1, overflow: TextOverflow.ellipsis),
+                            trailing: const Icon(Icons.chevron_right),
+                            onTap: () => context.go(item.path),
                           ),
                         ),
                     ],

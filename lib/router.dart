@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'auth/auth_notifier.dart';
 import 'auth/route_access.dart';
 
+import 'lazy_screens.dart';
 import 'models/author.dart';
 import 'models/author_query.dart';
 import 'models/book.dart';
@@ -17,32 +18,22 @@ import 'repositories/author_repository.dart';
 import 'repositories/book_repository.dart';
 import 'repositories/entity_repository.dart';
 import 'screens/author_detail_screen.dart';
-import 'screens/author_form_screen.dart';
 import 'screens/author_list_screen.dart';
 import 'screens/book_detail_screen.dart';
-import 'screens/book_form_screen.dart';
 import 'screens/book_list_screen.dart';
 import 'screens/dashboard_screen.dart';
-import 'screens/desk_screen.dart';
 import 'screens/forbidden_screen.dart';
 import 'screens/genre_detail_screen.dart';
-import 'screens/genre_form_screen.dart';
 import 'screens/genre_list_screen.dart';
-import 'screens/loan_form_screen.dart';
 import 'screens/loan_list_screen.dart';
 import 'screens/login_screen.dart';
-import 'screens/my_loans_screen.dart';
 import 'screens/not_found_screen.dart';
 import 'screens/offline_screen.dart';
 import 'screens/publisher_detail_screen.dart';
-import 'screens/publisher_form_screen.dart';
 import 'screens/publisher_list_screen.dart';
 import 'screens/reader_detail_screen.dart';
-import 'screens/reader_form_screen.dart';
 import 'screens/reader_list_screen.dart';
 import 'screens/register_screen.dart';
-import 'screens/stats_screen.dart';
-import 'screens/users_screen.dart';
 import 'state/detail_notifier.dart';
 
 int? _idFrom(GoRouterState state) => int.tryParse(state.pathParameters['id'] ?? '');
@@ -58,10 +49,7 @@ GoRoute _entityRoute<T>({
     path: '/$path',
     builder: (context, state) => list(state),
     routes: [
-      GoRoute(
-        path: 'new',
-        builder: (context, state) => form(null),
-      ),
+      GoRoute(path: 'new', builder: (context, state) => form(null)),
       GoRoute(
         path: ':id',
         builder: (context, state) {
@@ -126,58 +114,29 @@ GoRouter buildRouter({required AuthNotifier auth, String initialLocation = '/'})
     refreshListenable: auth,
     redirect: (context, state) => guardLocation(auth, state),
     routes: [
-      GoRoute(
-        path: '/',
-        builder: (context, state) => const DashboardScreen(),
-      ),
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginScreen(),
-      ),
-      GoRoute(
-        path: '/register',
-        builder: (context, state) => const RegisterScreen(),
-      ),
-      GoRoute(
-        path: '/offline',
-        builder: (context, state) => const OfflineScreen(),
-      ),
+      GoRoute(path: '/', builder: (context, state) => const DashboardScreen()),
+      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+      GoRoute(path: '/register', builder: (context, state) => const RegisterScreen()),
+      GoRoute(path: '/offline', builder: (context, state) => const OfflineScreen()),
       GoRoute(
         path: '/forbidden',
-        builder: (context, state) =>
-            ForbiddenScreen(attempted: state.uri.queryParameters['path']),
+        builder: (context, state) => ForbiddenScreen(attempted: state.uri.queryParameters['path']),
       ),
-      GoRoute(
-        path: '/my/loans',
-        builder: (context, state) => const MyLoansScreen(),
-      ),
-      GoRoute(
-        path: '/desk',
-        builder: (context, state) => const DeskScreen(),
-      ),
-      GoRoute(
-        path: '/admin/users',
-        builder: (context, state) => const UsersScreen(),
-      ),
-      GoRoute(
-        path: '/admin/stats',
-        builder: (context, state) => const StatsScreen(),
-      ),
+      GoRoute(path: '/my/loans', builder: (context, state) => lazyScreens.myLoansScreen()),
+      GoRoute(path: '/desk', builder: (context, state) => lazyScreens.deskScreen()),
+      GoRoute(path: '/admin/users', builder: (context, state) => lazyScreens.usersScreen()),
+      GoRoute(path: '/admin/stats', builder: (context, state) => lazyScreens.statsScreen()),
       _entityRoute<Book>(
         path: 'books',
-        list: (state) => BookListScreen(
-          query: BookQuery.fromParams(state.uri.queryParameters),
-        ),
-        form: (id) => BookFormScreen(bookId: id),
+        list: (state) => BookListScreen(query: BookQuery.fromParams(state.uri.queryParameters)),
+        form: (id) => lazyScreens.bookForm(id),
         detail: const BookDetailScreen(),
         finder: (context) => context.read<BookRepository>().findById,
       ),
       _entityRoute<Author>(
         path: 'authors',
-        list: (state) => AuthorListScreen(
-          query: AuthorQuery.fromParams(state.uri.queryParameters),
-        ),
-        form: (id) => AuthorFormScreen(authorId: id),
+        list: (state) => AuthorListScreen(query: AuthorQuery.fromParams(state.uri.queryParameters)),
+        form: (id) => lazyScreens.authorForm(id),
         detail: const AuthorDetailScreen(),
         finder: (context) => context.read<AuthorRepository>().findById,
       ),
@@ -190,7 +149,7 @@ GoRouter buildRouter({required AuthNotifier auth, String initialLocation = '/'})
             defaultSort: 'name',
           ),
         ),
-        form: (id) => GenreFormScreen(genreId: id),
+        form: (id) => lazyScreens.genreForm(id),
         detail: const GenreDetailScreen(),
         finder: (context) => context.read<GenreRepository>().findById,
       ),
@@ -203,7 +162,7 @@ GoRouter buildRouter({required AuthNotifier auth, String initialLocation = '/'})
             defaultSort: 'name',
           ),
         ),
-        form: (id) => PublisherFormScreen(publisherId: id),
+        form: (id) => lazyScreens.publisherForm(id),
         detail: const PublisherDetailScreen(),
         finder: (context) => context.read<PublisherRepository>().findById,
       ),
@@ -216,7 +175,7 @@ GoRouter buildRouter({required AuthNotifier auth, String initialLocation = '/'})
             defaultSort: 'fullName',
           ),
         ),
-        form: (id) => ReaderFormScreen(readerId: id),
+        form: (id) => lazyScreens.readerForm(id),
         detail: const ReaderDetailScreen(),
         finder: (context) => context.read<ReaderRepository>().findById,
       ),
@@ -229,12 +188,7 @@ GoRouter buildRouter({required AuthNotifier auth, String initialLocation = '/'})
             defaultSort: 'issuedAt',
           ),
         ),
-        routes: [
-          GoRoute(
-            path: 'new',
-            builder: (context, state) => const LoanFormScreen(),
-          ),
-        ],
+        routes: [GoRoute(path: 'new', builder: (context, state) => lazyScreens.loanForm())],
       ),
     ],
     errorBuilder: (context, state) => NotFoundScreen(location: state.uri.toString()),

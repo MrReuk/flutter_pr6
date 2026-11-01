@@ -24,10 +24,7 @@ class ReaderDetailScreen extends StatelessWidget {
         final card = reader.card;
         return [
           DetailField(label: 'Почта', child: Text(reader.email)),
-          DetailField(
-            label: 'Телефон',
-            child: Text(reader.phone.isEmpty ? '—' : reader.phone),
-          ),
+          DetailField(label: 'Телефон', child: Text(reader.phone.isEmpty ? '—' : reader.phone)),
           DetailField(
             label: 'Читательский билет',
             child: card == null
@@ -41,8 +38,7 @@ class ReaderDetailScreen extends StatelessWidget {
                         children: [
                           Text(card.number),
                           const SizedBox(height: 4),
-                          if (card.issuedAt != null)
-                            Text('Выдан: ${formatRuDate(card.issuedAt!)}'),
+                          if (card.issuedAt != null) Text('Выдан: ${formatRuDate(card.issuedAt!)}'),
                           if (card.expiresAt != null)
                             Text('Действует до: ${formatRuDate(card.expiresAt!)}'),
                           const SizedBox(height: 8),

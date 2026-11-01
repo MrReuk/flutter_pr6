@@ -43,12 +43,7 @@ class AuthFrame extends StatelessWidget {
 
 /// Цветная плашка с сообщением: ошибка или пояснение.
 class NoticeBanner extends StatelessWidget {
-  const NoticeBanner({
-    super.key,
-    required this.message,
-    this.isError = true,
-    this.onClose,
-  });
+  const NoticeBanner({super.key, required this.message, this.isError = true, this.onClose});
 
   final String message;
   final bool isError;
@@ -62,20 +57,25 @@ class NoticeBanner extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: background,
-        borderRadius: BorderRadius.circular(8),
-      ),
+      decoration: BoxDecoration(color: background, borderRadius: BorderRadius.circular(8)),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(isError ? Icons.error_outline : Icons.info_outline, color: foreground),
           const SizedBox(width: 8),
-          Expanded(child: Text(message, style: TextStyle(color: foreground))),
+          Expanded(
+            child: Text(message, style: TextStyle(color: foreground)),
+          ),
           if (onClose != null)
-            InkWell(
-              onTap: onClose,
-              child: Icon(Icons.close, size: 18, color: foreground),
+            IconButton(
+              tooltip: 'Закрыть сообщение',
+              onPressed: onClose,
+              visualDensity: VisualDensity.compact,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints.tightFor(width: 32, height: 32),
+              iconSize: 18,
+              color: foreground,
+              icon: const Icon(Icons.close),
             ),
         ],
       ),

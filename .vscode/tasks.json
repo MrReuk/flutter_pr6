@@ -8,16 +8,16 @@
       "problemMatcher": []
     },
     {
-      "label": "2 Сервер ПР5 на 8080 (порт страницы 5555)",
+      "label": "2 Сервер на 8080 (страница на 5555 или 8000)",
       "type": "shell",
-      "command": "node tools/mock-server-pr5.js --port 8080 --origin http://localhost:5555",
+      "command": "node tools/mock-server-pr5.js --port 8080 --origin http://localhost:5555,http://localhost:8000",
       "isBackground": true,
       "problemMatcher": []
     },
     {
-      "label": "3 Сервер ПР5 на 8080, токен живёт 60 секунд",
+      "label": "3 Сервер на 8080, токен живёт 60 секунд",
       "type": "shell",
-      "command": "node tools/mock-server-pr5.js --port 8080 --origin http://localhost:5555 --ttl 60",
+      "command": "node tools/mock-server-pr5.js --port 8080 --origin http://localhost:5555,http://localhost:8000 --ttl 60",
       "isBackground": true,
       "problemMatcher": []
     },
@@ -31,21 +31,46 @@
     {
       "label": "5 Приложение в Chrome, порт 5555",
       "type": "shell",
-      "command": "flutter run -d chrome --web-port=5555",
+      "command": "flutter run -d chrome --web-port=5555 --dart-define=API_BASE_URL=http://localhost:8080/api",
       "isBackground": true,
       "problemMatcher": []
     },
     {
       "label": "6 Приложение в Chrome: выход через 30 с, предупреждение за 10 с",
       "type": "shell",
-      "command": "flutter run -d chrome --web-port=5555 --dart-define=INACTIVITY_SECONDS=30 --dart-define=INACTIVITY_WARNING_SECONDS=10",
+      "command": "flutter run -d chrome --web-port=5555 --dart-define=API_BASE_URL=http://localhost:8080/api --dart-define=INACTIVITY_SECONDS=30 --dart-define=INACTIVITY_WARNING_SECONDS=10",
       "isBackground": true,
       "problemMatcher": []
     },
     {
-      "label": "7 Проверка проекта: analyze и test (результат в check.log)",
+      "label": "7 Проверка проекта: format, analyze, test (результат в check.log)",
       "type": "shell",
       "command": "tools\\check.bat",
+      "problemMatcher": []
+    },
+    {
+      "label": "8 Сборка для публикации: build\\web, базовый путь /library/",
+      "type": "shell",
+      "command": "tools\\build-web.bat /library/ http://localhost:8080/api",
+      "problemMatcher": []
+    },
+    {
+      "label": "9 Раздать сборку как GitHub Pages: http://localhost:8000/library/",
+      "type": "shell",
+      "command": "node tools/serve-build.js build/web --base /library/ --port 8000",
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "10 Замер размеров: четыре сборки (build\\size-report.md)",
+      "type": "shell",
+      "command": "tools\\measure-builds.bat",
+      "problemMatcher": []
+    },
+    {
+      "label": "11 Перечень тестов (build\\tests.json)",
+      "type": "shell",
+      "command": "tools\\test-list.bat",
       "problemMatcher": []
     }
   ]

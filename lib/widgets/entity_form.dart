@@ -100,16 +100,8 @@ class FieldSpec {
     );
   }
 
-  factory FieldSpec.group({
-    required String title,
-    required List<FieldSpec> fields,
-  }) {
-    return FieldSpec._(
-      kind: FieldKind.group,
-      key: title,
-      label: title,
-      children: fields,
-    );
+  factory FieldSpec.group({required String title, required List<FieldSpec> fields}) {
+    return FieldSpec._(kind: FieldKind.group, key: title, label: title, children: fields);
   }
 
   final FieldKind kind;
@@ -174,13 +166,15 @@ class _EntityFormState extends State<EntityForm> {
       final initial = widget.initialValues[spec.key];
       switch (spec.kind) {
         case FieldKind.text:
-          _controllers[spec.key] =
-              TextEditingController(text: initial == null ? '' : '$initial');
+          _controllers[spec.key] = TextEditingController(text: initial == null ? '' : '$initial');
         case FieldKind.dropdown:
           _ids[spec.key] = initial is int ? initial : null;
         case FieldKind.multi:
           _lists[spec.key] = initial is List
-              ? <int>[for (final e in initial) if (e is int) e]
+              ? <int>[
+                  for (final e in initial)
+                    if (e is int) e,
+                ]
               : <int>[];
         case FieldKind.group:
           break;
@@ -260,9 +254,9 @@ class _EntityFormState extends State<EntityForm> {
     } catch (e) {
       errors = const {};
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Не удалось сохранить: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Не удалось сохранить: $e')));
       }
     }
     if (!mounted) return;
@@ -306,10 +300,7 @@ class _EntityFormState extends State<EntityForm> {
   List<Widget> _buildFields(List<FieldSpec> fields) {
     return [
       for (final field in fields)
-        Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: _buildField(field),
-        ),
+        Padding(padding: const EdgeInsets.only(bottom: 16), child: _buildField(field)),
     ];
   }
 
@@ -350,10 +341,7 @@ class _EntityFormState extends State<EntityForm> {
       isExpanded: true,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       hint: const Text('Выберите значение'),
-      decoration: InputDecoration(
-        labelText: spec.title,
-        border: const OutlineInputBorder(),
-      ),
+      decoration: InputDecoration(labelText: spec.title, border: const OutlineInputBorder()),
       items: [
         for (final option in options)
           DropdownMenuItem<int>(
@@ -380,9 +368,7 @@ class _EntityFormState extends State<EntityForm> {
     final shown = useNarrow
         ? [
             for (final option in all)
-              if (narrowed.any((n) => n.id == option.id) ||
-                  selected.contains(option.id))
-                option,
+              if (narrowed.any((n) => n.id == option.id) || selected.contains(option.id)) option,
           ]
         : all;
 

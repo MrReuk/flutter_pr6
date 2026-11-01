@@ -25,8 +25,7 @@ Book _draft({String isbn = '978-5-00-000001-0', String title = 'Новая кн�
   );
 }
 
-SimpleQuery _genreQuery() =>
-    SimpleQuery.initial(sortFields: kGenreSortFields, defaultSort: 'name');
+SimpleQuery _genreQuery() => SimpleQuery.initial(sortFields: kGenreSortFields, defaultSort: 'name');
 
 void main() {
   late FakeServer server;
@@ -78,35 +77,33 @@ void main() {
     await expectLater(
       repos.books.create(_draft(isbn: '978-5-389-07773-7')),
       throwsA(
-        isA<ValidationException>().having(
-          (e) => e.errors,
-          'ошибки по полям',
-          {'isbn': 'Книга с таким ISBN уже существует'},
-        ),
+        isA<ValidationException>().having((e) => e.errors, 'ошибки по полям', {
+          'isbn': 'Книга с таким ISBN уже существует',
+        }),
       ),
     );
   });
 
-  test('Ошибка 409 при выдаче книги без свободных экземпляров становится ConflictException', () async {
-    await expectLater(
-      repos.loans.issue(readerId: 1, bookId: 3, days: 14),
-      throwsA(
-        isA<ConflictException>().having(
-          (e) => e.message,
-          'сообщение',
-          'Нет свободных экземпляров этой книги',
+  test(
+    'Ошибка 409 при выдаче книги без свободных экземпляров становится ConflictException',
+    () async {
+      await expectLater(
+        repos.loans.issue(readerId: 1, bookId: 3, days: 14),
+        throwsA(
+          isA<ConflictException>().having(
+            (e) => e.message,
+            'сообщение',
+            'Нет свободных экземпляров этой книги',
+          ),
         ),
-      ),
-    );
-  });
+      );
+    },
+  );
 
   test('Недоступный сервер даёт NetworkException после трёх попыток чтения', () async {
     server.down = true;
 
-    await expectLater(
-      repos.books.find(const BookQuery()),
-      throwsA(isA<NetworkException>()),
-    );
+    await expectLater(repos.books.find(const BookQuery()), throwsA(isA<NetworkException>()));
 
     expect(server.calls('GET', '/books'), hasLength(3));
   });
@@ -127,10 +124,7 @@ void main() {
   test('Ошибка 500 превращается в ServerException без повторов', () async {
     final failing = await makeRepositories(server, debugFlags: {'__fail': '500'});
 
-    await expectLater(
-      failing.books.find(const BookQuery()),
-      throwsA(isA<ServerException>()),
-    );
+    await expectLater(failing.books.find(const BookQuery()), throwsA(isA<ServerException>()));
 
     expect(server.calls('GET', '/books'), hasLength(1));
   });
@@ -138,10 +132,7 @@ void main() {
   test('Ответ в неожиданном формате не роняет приложение', () async {
     server.malformed = true;
 
-    await expectLater(
-      repos.books.find(const BookQuery()),
-      throwsA(isA<ServerException>()),
-    );
+    await expectLater(repos.books.find(const BookQuery()), throwsA(isA<ServerException>()));
   });
 
   test('Несуществующая запись возвращается как null', () async {
@@ -180,10 +171,7 @@ void main() {
 
     await slow.authors.find(const AuthorQuery());
 
-    expect(
-      server.calls('GET', '/authors').single.uri.queryParameters['__delay'],
-      '1500',
-    );
+    expect(server.calls('GET', '/authors').single.uri.queryParameters['__delay'], '1500');
   });
 
   test('Издательство с книгами нельзя удалить, запрос на удаление не отправляется', () async {

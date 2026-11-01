@@ -4,9 +4,17 @@ import 'package:provider/provider.dart';
 
 import '../auth/auth_notifier.dart';
 import '../auth/permissions.dart';
+import '../core/breakpoints.dart';
 import '../state/unsaved_changes.dart';
 import 'confirm_dialog.dart';
 
+/// Каркас экранов с меню. Вид меню зависит от ширины окна:
+///
+/// * до 600: нижняя панель, разделы, которые в неё не поместились, лежат в «Ещё»;
+/// * от 600 до 1200: боковая полоса со значками и подписями под ними;
+/// * от 1200: раскрытая боковая полоса, подписи стоят рядом со значками.
+///
+/// Содержимое страницы не шире [kContentMaxWidth] и стоит по центру.
 class LibraryScaffold extends StatelessWidget {
   const LibraryScaffold({
     super.key,
@@ -26,44 +34,72 @@ class LibraryScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthNotifier>();
-    final items = [
-      for (final item in kNavItems)
-        if (item.permission == null || auth.can(item.permission!)) item,
-    ];
-    // Подписи у кнопок меню показываем, только если они помещаются в шапку:
-    // у администратора и библиотекаря разделов больше, чем у читателя.
-    final narrow = MediaQuery.sizeOf(context).width < items.length * 140 + 460;
+    final items = visibleNavItems(auth.can);
+    final size = screenSizeOf(context);
+    final path = _currentPath(context);
+
+    void open(String location) {
+      guardedNavigate(context, unsaved, () => context.go(location));
+    }
+
+    final appBar = AppBar(
+      leading: showBack
+          ? BackButton(
+              onPressed: () => guardedNavigate(context, unsaved, () {
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  context.go(backPath);
+                }
+              }),
+            )
+          : null,
+      title: Text(title, overflow: TextOverflow.ellipsis),
+      actions: [
+        if (auth.user != null) _UserMenu(auth: auth, unsaved: unsaved),
+        const SizedBox(width: 8),
+      ],
+    );
+
+    final content = Align(
+      alignment: Alignment.topCenter,
+      child: ConstrainedBox(
+        key: const ValueKey('page-content'),
+        constraints: const BoxConstraints(maxWidth: kContentMaxWidth),
+        child: body,
+      ),
+    );
+
+    if (size == ScreenSize.compact) {
+      return Scaffold(
+        appBar: appBar,
+        body: content,
+        bottomNavigationBar: items.length < 2
+            ? null
+            : _BottomNav(items: items, path: path, onOpen: open),
+      );
+    }
 
     return Scaffold(
-      appBar: AppBar(
-        leading: showBack
-            ? BackButton(
-                onPressed: () => guardedNavigate(context, unsaved, () {
-                  if (context.canPop()) {
-                    context.pop();
-                  } else {
-                    context.go(backPath);
-                  }
-                }),
-              )
-            : null,
-        title: Text(title),
-        actions: [
-          for (final item in items)
-            _NavButton(
-              icon: item.icon,
-              label: item.label,
-              onTap: () => guardedNavigate(context, unsaved, () => context.go(item.path)),
-              narrow: narrow,
-            ),
-          const SizedBox(width: 4),
-          if (auth.user != null)
-            _UserMenu(auth: auth, unsaved: unsaved),
-          const SizedBox(width: 8),
+      appBar: appBar,
+      body: Row(
+        children: [
+          if (items.length >= 2)
+            _SideNav(items: items, path: path, extended: size == ScreenSize.expanded, onOpen: open),
+          if (items.length >= 2) const VerticalDivider(width: 1),
+          Expanded(child: content),
         ],
       ),
-      body: body,
     );
+  }
+}
+
+String _currentPath(BuildContext context) {
+  try {
+    return GoRouterState.of(context).uri.path;
+  } catch (_) {
+    // Каркас показан вне маршрутизатора (например, в тесте виджета).
+    return '';
   }
 }
 
@@ -75,37 +111,201 @@ const List<NavItem> kNavItems = [
   (icon: Icons.menu_book, label: 'Книги', path: '/books', permission: Permission.viewCatalog),
   (icon: Icons.people, label: 'Авторы', path: '/authors', permission: Permission.viewCatalog),
   (icon: Icons.category, label: 'Жанры', path: '/genres', permission: Permission.viewCatalog),
-  (icon: Icons.apartment, label: 'Издательства', path: '/publishers', permission: Permission.viewCatalog),
+  (
+    icon: Icons.apartment,
+    label: 'Издательства',
+    path: '/publishers',
+    permission: Permission.viewCatalog,
+  ),
   (icon: Icons.badge, label: 'Читатели', path: '/readers', permission: Permission.viewReaders),
   (icon: Icons.assignment, label: 'Выдачи', path: '/loans', permission: Permission.viewAllLoans),
-  (icon: Icons.bookmarks, label: 'Мои выдачи', path: '/my/loans', permission: Permission.viewOwnLoans),
-  (icon: Icons.support_agent, label: 'Рабочее место', path: '/desk', permission: Permission.useDesk),
-  (icon: Icons.manage_accounts, label: 'Пользователи', path: '/admin/users', permission: Permission.manageUsers),
-  (icon: Icons.bar_chart, label: 'Статистика', path: '/admin/stats', permission: Permission.viewStats),
+  (
+    icon: Icons.bookmarks,
+    label: 'Мои выдачи',
+    path: '/my/loans',
+    permission: Permission.viewOwnLoans,
+  ),
+  (
+    icon: Icons.support_agent,
+    label: 'Рабочее место',
+    path: '/desk',
+    permission: Permission.useDesk,
+  ),
+  (
+    icon: Icons.manage_accounts,
+    label: 'Пользователи',
+    path: '/admin/users',
+    permission: Permission.manageUsers,
+  ),
+  (
+    icon: Icons.bar_chart,
+    label: 'Статистика',
+    path: '/admin/stats',
+    permission: Permission.viewStats,
+  ),
 ];
 
-class _NavButton extends StatelessWidget {
-  const _NavButton({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-    required this.narrow,
-  });
+/// Разделы, доступные роли. [can] отвечает, разрешена ли операция.
+List<NavItem> visibleNavItems(bool Function(Permission permission) can) {
+  return [
+    for (final item in kNavItems)
+      if (item.permission == null || can(item.permission!)) item,
+  ];
+}
 
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-  final bool narrow;
+/// В каком порядке разделы занимают места в нижней панели. Что не поместилось,
+/// уходит в «Ещё».
+const List<String> kBottomPriority = [
+  '/',
+  '/books',
+  '/my/loans',
+  '/desk',
+  '/loans',
+  '/admin/stats',
+  '/authors',
+  '/readers',
+  '/admin/users',
+  '/genres',
+  '/publishers',
+];
+
+typedef BottomSplit = ({List<NavItem> primary, List<NavItem> more});
+
+/// Делит разделы между нижней панелью и пунктом «Ещё». Если разделов не больше
+/// [slots], «Ещё» не нужен. Порядок внутри каждой части сохраняется.
+BottomSplit splitForBottomBar(List<NavItem> items, {int slots = 5}) {
+  if (items.length <= slots) return (primary: items, more: const <NavItem>[]);
+  int rank(NavItem item) {
+    final index = kBottomPriority.indexOf(item.path);
+    return index < 0 ? kBottomPriority.length : index;
+  }
+
+  final ranked = [...items]
+    ..sort((a, b) {
+      final byRank = rank(a).compareTo(rank(b));
+      return byRank != 0 ? byRank : items.indexOf(a).compareTo(items.indexOf(b));
+    });
+  final keep = {for (final item in ranked.take(slots - 1)) item.path};
+  return (
+    primary: [
+      for (final item in items)
+        if (keep.contains(item.path)) item,
+    ],
+    more: [
+      for (final item in items)
+        if (!keep.contains(item.path)) item,
+    ],
+  );
+}
+
+bool _matches(String itemPath, String path) {
+  if (itemPath == '/') return path == '/';
+  return path == itemPath || path.startsWith('$itemPath/');
+}
+
+/// Номер раздела, к которому относится адрес [path], или null.
+int? selectedNavIndex(List<NavItem> items, String path) {
+  for (var i = 0; i < items.length; i++) {
+    if (_matches(items[i].path, path)) return i;
+  }
+  return null;
+}
+
+class _BottomNav extends StatelessWidget {
+  const _BottomNav({required this.items, required this.path, required this.onOpen});
+
+  final List<NavItem> items;
+  final String path;
+  final ValueChanged<String> onOpen;
+
+  Future<void> _openMore(BuildContext context, List<NavItem> more) async {
+    final picked = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: ListView(
+          key: const ValueKey('more-sheet'),
+          shrinkWrap: true,
+          children: [
+            for (final item in more)
+              ListTile(
+                leading: Icon(item.icon),
+                title: Text(item.label),
+                selected: _matches(item.path, path),
+                onTap: () => Navigator.of(sheetContext).pop(item.path),
+              ),
+          ],
+        ),
+      ),
+    );
+    if (picked != null && context.mounted) onOpen(picked);
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (narrow) {
-      return IconButton(tooltip: label, icon: Icon(icon), onPressed: onTap);
-    }
-    return TextButton.icon(
-      onPressed: onTap,
-      icon: Icon(icon),
-      label: Text(label),
+    final split = splitForBottomBar(items);
+    final hasMore = split.more.isNotEmpty;
+    final primarySelected = selectedNavIndex(split.primary, path);
+    final moreSelected = hasMore && selectedNavIndex(split.more, path) != null;
+    final selected = moreSelected ? split.primary.length : (primarySelected ?? 0);
+
+    return NavigationBar(
+      key: const ValueKey('bottom-nav'),
+      selectedIndex: selected,
+      onDestinationSelected: (index) {
+        if (index < split.primary.length) {
+          onOpen(split.primary[index].path);
+        } else {
+          _openMore(context, split.more);
+        }
+      },
+      destinations: [
+        for (final item in split.primary)
+          NavigationDestination(icon: Icon(item.icon), label: item.label),
+        if (hasMore) const NavigationDestination(icon: Icon(Icons.more_horiz), label: 'Ещё'),
+      ],
+    );
+  }
+}
+
+class _SideNav extends StatelessWidget {
+  const _SideNav({
+    required this.items,
+    required this.path,
+    required this.extended,
+    required this.onOpen,
+  });
+
+  final List<NavItem> items;
+  final String path;
+  final bool extended;
+  final ValueChanged<String> onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    // Разделов может быть больше, чем помещается по высоте окна: полоса прокручивается.
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: IntrinsicHeight(
+              child: NavigationRail(
+                key: const ValueKey('side-nav'),
+                selectedIndex: selectedNavIndex(items, path),
+                onDestinationSelected: (index) => onOpen(items[index].path),
+                extended: extended,
+                minWidth: 96,
+                labelType: extended ? NavigationRailLabelType.none : NavigationRailLabelType.all,
+                destinations: [
+                  for (final item in items)
+                    NavigationRailDestination(icon: Icon(item.icon), label: Text(item.label)),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -132,10 +332,7 @@ class _UserMenu extends StatelessWidget {
         });
       },
       itemBuilder: (context) => [
-        PopupMenuItem<String>(
-          enabled: false,
-          child: Text('${user.fullName}\n${user.role.label}'),
-        ),
+        PopupMenuItem<String>(enabled: false, child: Text('${user.fullName}\n${user.role.label}')),
         const PopupMenuDivider(),
         const PopupMenuItem<String>(
           value: 'logout',
@@ -168,10 +365,7 @@ class _UserMenu extends StatelessWidget {
                           style: Theme.of(context).textTheme.labelLarge,
                         ),
                       ),
-                      Text(
-                        user.role.label,
-                        style: Theme.of(context).textTheme.labelSmall,
-                      ),
+                      Text(user.role.label, style: Theme.of(context).textTheme.labelSmall),
                     ],
                   ),
                   const Icon(Icons.arrow_drop_down),

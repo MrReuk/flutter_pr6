@@ -21,17 +21,10 @@ class GenreListScreen extends StatelessWidget {
         emptyMessage: 'Жанры не найдены. Измените поиск или фильтры.',
         addLabel: 'Добавить жанр',
         columns: (context) => [
-          TableColumnSpec<Genre>(
-            label: 'Название',
-            sortField: 'name',
-            build: (g) => Text(g.name),
-          ),
+          TableColumnSpec<Genre>(label: 'Название', sortField: 'name', build: (g) => Text(g.name)),
           TableColumnSpec<Genre>(
             label: 'Описание',
-            build: (g) => CellText(
-              g.description.isEmpty ? '—' : g.description,
-              maxWidth: 480,
-            ),
+            build: (g) => CellText(g.description.isEmpty ? '—' : g.description, maxWidth: 480),
           ),
         ],
         idOf: (g) => g.id,

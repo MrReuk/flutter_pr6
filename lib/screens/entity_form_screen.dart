@@ -85,9 +85,7 @@ class _EntityFormScreenState<T> extends State<EntityFormScreen<T>> {
       await widget.save(values, existing);
     } on ValidationException catch (e) {
       messenger.showSnackBar(
-        const SnackBar(
-          content: Text('Сервер отклонил данные. Проверьте выделенные поля.'),
-        ),
+        const SnackBar(content: Text('Сервер отклонил данные. Проверьте выделенные поля.')),
       );
       return e.errors;
     } on ConflictException catch (e) {
@@ -96,9 +94,7 @@ class _EntityFormScreenState<T> extends State<EntityFormScreen<T>> {
       }
       return const {};
     } catch (e) {
-      messenger.showSnackBar(
-        SnackBar(content: Text('Не удалось сохранить: ${describeError(e)}')),
-      );
+      messenger.showSnackBar(SnackBar(content: Text('Не удалось сохранить: ${describeError(e)}')));
       return const {};
     }
     messenger.showSnackBar(SnackBar(content: Text(widget.savedMessage)));
@@ -148,11 +144,7 @@ class _EntityFormScreenState<T> extends State<EntityFormScreen<T>> {
                 _unsaved.dirty = dirty;
                 setState(() => _dirty = dirty);
               },
-              onCancel: () => guardedNavigate(
-                context,
-                _unsaved,
-                () => _leaveClean(false),
-              ),
+              onCancel: () => guardedNavigate(context, _unsaved, () => _leaveClean(false)),
             );
           },
         ),

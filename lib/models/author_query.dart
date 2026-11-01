@@ -47,10 +47,7 @@ class AuthorQuery {
 
   String toLocation(String path) {
     final params = toParams();
-    return Uri(
-      path: path,
-      queryParameters: params.isEmpty ? null : params,
-    ).toString();
+    return Uri(path: path, queryParameters: params.isEmpty ? null : params).toString();
   }
 
   AuthorQuery copyWith({
@@ -83,12 +80,5 @@ class AuthorQuery {
           other.includeDeleted == includeDeleted;
 
   @override
-  int get hashCode => Object.hash(
-        search,
-        sortField,
-        sortAscending,
-        page,
-        size,
-        includeDeleted,
-      );
+  int get hashCode => Object.hash(search, sortField, sortAscending, page, size, includeDeleted);
 }

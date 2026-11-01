@@ -40,10 +40,7 @@ class ForbiddenScreen extends StatelessWidget {
                 ),
               ],
               const SizedBox(height: 20),
-              FilledButton(
-                onPressed: () => context.go('/'),
-                child: const Text('На главную'),
-              ),
+              FilledButton(onPressed: () => context.go('/'), child: const Text('На главную')),
             ],
           ),
         ),

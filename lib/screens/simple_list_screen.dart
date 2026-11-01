@@ -15,11 +15,8 @@ import '../widgets/list_toolbar.dart';
 import '../widgets/row_actions.dart';
 import '../widgets/selection_bar.dart';
 
-typedef FilterBuilder = List<Widget> Function(
-  BuildContext context,
-  SimpleQuery query,
-  ValueChanged<SimpleQuery> apply,
-);
+typedef FilterBuilder =
+    List<Widget> Function(BuildContext context, SimpleQuery query, ValueChanged<SimpleQuery> apply);
 
 class SimpleListConfig<T> {
   const SimpleListConfig({
@@ -56,11 +53,8 @@ class SimpleListConfig<T> {
   final bool editable;
   final bool openable;
   final Permission managePermission;
-  final List<Widget> Function(
-    BuildContext context,
-    T item,
-    Future<void> Function() reload,
-  )? extraActions;
+  final List<Widget> Function(BuildContext context, T item, Future<void> Function() reload)?
+  extraActions;
 }
 
 class SimpleListScreen<T> extends StatefulWidget {
@@ -122,8 +116,7 @@ class _SimpleListScreenState<T> extends State<SimpleListScreen<T>> {
     final confirmed = await confirmAction(
       context,
       title: 'Удалить выбранные записи?',
-      message:
-          'Будет удалено записей: ${notifier.selected.length}. Их можно восстановить.',
+      message: 'Будет удалено записей: ${notifier.selected.length}. Их можно восстановить.',
     );
     if (!confirmed) return;
     final summary = await notifier.deleteSelected();
@@ -136,8 +129,8 @@ class _SimpleListScreenState<T> extends State<SimpleListScreen<T>> {
           failure != null
               ? 'Не удалось удалить записи: $failure'
               : skipped > 0
-                  ? 'Удалено записей: ${summary.deleted} из ${summary.requested}. Остальные нельзя удалить: с ними связаны другие записи.'
-                  : 'Удалено записей: ${summary.deleted}',
+              ? 'Удалено записей: ${summary.deleted} из ${summary.requested}. Остальные нельзя удалить: с ними связаны другие записи.'
+              : 'Удалено записей: ${summary.deleted}',
         ),
       ),
     );
@@ -185,10 +178,9 @@ class _SimpleListScreenState<T> extends State<SimpleListScreen<T>> {
               error: notifier.error,
               result: notifier.result,
               onRetry: notifier.load,
+              offline: notifier.offline,
               emptyMessage: config.emptyMessage,
-              onReset: q.search.isNotEmpty || q.activeFilterCount > 0
-                  ? () => _go(q.reset())
-                  : null,
+              onReset: q.search.isNotEmpty || q.activeFilterCount > 0 ? () => _go(q.reset()) : null,
               columns: config.columns(context),
               idOf: config.idOf,
               isDeleted: config.isDeleted,
@@ -213,11 +205,8 @@ class _SimpleListScreenState<T> extends State<SimpleListScreen<T>> {
                   deleted: config.isDeleted(item),
                   rights: rights,
                   name: config.nameOf(item),
-                  onEdit: config.editable
-                      ? () => _open('${config.path}/$id/edit')
-                      : null,
-                  extra: config.extraActions?.call(context, item, notifier.load) ??
-                      const [],
+                  onEdit: config.editable ? () => _open('${config.path}/$id/edit') : null,
+                  extra: config.extraActions?.call(context, item, notifier.load) ?? const [],
                   onSoftDelete: () => _afterChange(() => notifier.softDelete(id)),
                   onHardDelete: () => _afterChange(() => notifier.hardDelete(id)),
                   onRestore: () => _afterChange(() => notifier.restore(id)),

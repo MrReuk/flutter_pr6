@@ -33,13 +33,13 @@ class AppUser {
   }
 
   Map<String, Object?> toJson() => {
-        'id': id,
-        'username': username,
-        'fullName': fullName,
-        'email': email,
-        'role': role.code,
-        'readerId': readerId,
-      };
+    'id': id,
+    'username': username,
+    'fullName': fullName,
+    'email': email,
+    'role': role.code,
+    'readerId': readerId,
+  };
 
   AppUser copyWith({Role? role}) {
     return AppUser(

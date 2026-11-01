@@ -30,8 +30,7 @@ class Book {
   factory Book.fromJson(Map<String, dynamic> json) {
     final authors = json.containsKey('authors') ? json['authors'] : json['authorIds'];
     final genres = json.containsKey('genres') ? json['genres'] : json['genreIds'];
-    final publisher =
-        json.containsKey('publisher') ? json['publisher'] : json['publisherId'];
+    final publisher = json.containsKey('publisher') ? json['publisher'] : json['publisherId'];
 
     return Book(
       id: jsonInt(json['id']),
@@ -49,15 +48,15 @@ class Book {
   }
 
   Map<String, dynamic> toJson() => {
-        'title': title,
-        'isbn': isbn,
-        'year': year,
-        'pages': pages,
-        'publisherId': publisherId,
-        'authorIds': authorIds,
-        'genreIds': genreIds,
-        'copiesTotal': copiesTotal,
-      };
+    'title': title,
+    'isbn': isbn,
+    'year': year,
+    'pages': pages,
+    'publisherId': publisherId,
+    'authorIds': authorIds,
+    'genreIds': genreIds,
+    'copiesTotal': copiesTotal,
+  };
 
   bool get isDeleted => deletedAt != null;
 

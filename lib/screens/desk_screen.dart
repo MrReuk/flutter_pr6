@@ -9,6 +9,7 @@ import '../repositories/entity_repository.dart';
 import '../state/paged_list_notifier.dart';
 import '../state/reference_notifier.dart';
 import '../validation/validators.dart';
+import '../widgets/action_card.dart';
 import '../widgets/confirm_dialog.dart';
 import '../widgets/library_scaffold.dart';
 import '../widgets/state_views.dart';
@@ -60,8 +61,10 @@ class _DeskScreenState extends State<DeskScreen> {
     });
     final repository = context.read<LoanRepository>();
     try {
-      final base = SimpleQuery.initial(sortFields: kLoanSortFields, defaultSort: 'dueAt')
-          .copyWith(size: 50);
+      final base = SimpleQuery.initial(
+        sortFields: kLoanSortFields,
+        defaultSort: 'dueAt',
+      ).copyWith(size: 50);
       final overdue = await repository.find(base.copyWith(filter: 'overdue'));
       final active = await repository.find(base.copyWith(filter: 'active'));
       if (mounted) setState(() => _loans = [...overdue.items, ...active.items]);
@@ -245,7 +248,10 @@ class _DeskScreenState extends State<DeskScreen> {
       return const Padding(padding: EdgeInsets.all(24), child: LoadingView());
     }
     if (_loadError != null) {
-      return SizedBox(height: 220, child: ErrorView(message: _loadError!, onRetry: _load));
+      return SizedBox(
+        height: 220,
+        child: ErrorView(message: _loadError!, onRetry: _load),
+      );
     }
     final loans = _loans ?? const <Loan>[];
     if (loans.isEmpty) {
@@ -254,22 +260,17 @@ class _DeskScreenState extends State<DeskScreen> {
     return Column(
       children: [
         for (final loan in loans)
-          Card(
-            child: ListTile(
-              key: ValueKey('desk-loan-${loan.id}'),
-              leading: Icon(
-                loan.status == LoanStatus.overdue ? Icons.warning_amber : Icons.menu_book,
-                color: loan.status == LoanStatus.overdue ? theme.colorScheme.error : null,
-              ),
-              title: Text(loan.bookTitle),
-              subtitle: Text(
-                '${loan.readerName}\n${loan.status.label} · вернуть до ${_date(loan.dueAt)}',
-              ),
-              isThreeLine: true,
-              trailing: OutlinedButton(
-                onPressed: _busyId == null ? () => _return(loan) : null,
-                child: const Text('Принять'),
-              ),
+          ActionCard(
+            key: ValueKey('desk-loan-${loan.id}'),
+            leading: Icon(
+              loan.status == LoanStatus.overdue ? Icons.warning_amber : Icons.menu_book,
+              color: loan.status == LoanStatus.overdue ? theme.colorScheme.error : null,
+            ),
+            title: loan.bookTitle,
+            subtitle: '${loan.readerName}\n${loan.status.label} · вернуть до ${_date(loan.dueAt)}',
+            action: OutlinedButton(
+              onPressed: _busyId == null ? () => _return(loan) : null,
+              child: const Text('Принять'),
             ),
           ),
       ],

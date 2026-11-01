@@ -43,19 +43,22 @@ void main() {
     expect(notifier.error, isNull);
   });
 
-  test('Недоступный сервер переводит состояние в ошибку, повтор после запуска сервера загружает данные', () async {
-    server.down = true;
-    await notifier.applyQuery(const BookQuery(), force: true);
+  test(
+    'Недоступный сервер переводит состояние в ошибку, повтор после запуска сервера загружает данные',
+    () async {
+      server.down = true;
+      await notifier.applyQuery(const BookQuery(), force: true);
 
-    expect(notifier.status, LoadStatus.error);
-    expect(notifier.error, contains('Не удалось загрузить список'));
+      expect(notifier.status, LoadStatus.error);
+      expect(notifier.error, contains('Не удалось загрузить список'));
 
-    server.down = false;
-    await notifier.load();
+      server.down = false;
+      await notifier.load();
 
-    expect(notifier.status, LoadStatus.success);
-    expect(notifier.result.items, isNotEmpty);
-  });
+      expect(notifier.status, LoadStatus.success);
+      expect(notifier.result.items, isNotEmpty);
+    },
+  );
 
   test('Выделение сбрасывается при смене условий отбора', () async {
     await notifier.applyQuery(const BookQuery(), force: true);
@@ -105,10 +108,7 @@ void main() {
 
   test('Отказ в удалении возвращает сообщение и не ломает список', () async {
     final publishers = PagedListNotifier<Publisher, SimpleQuery>(
-      initialQuery: SimpleQuery.initial(
-        sortFields: kPublisherSortFields,
-        defaultSort: 'name',
-      ),
+      initialQuery: SimpleQuery.initial(sortFields: kPublisherSortFields, defaultSort: 'name'),
       repository: (await makeRepositories(server)).publishers,
       idOf: (publisher) => publisher.id,
     );

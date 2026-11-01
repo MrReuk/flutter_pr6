@@ -25,11 +25,7 @@ class Publisher {
     );
   }
 
-  Map<String, dynamic> toJson() => {
-        'name': name,
-        'city': city,
-        'foundedYear': foundedYear,
-      };
+  Map<String, dynamic> toJson() => {'name': name, 'city': city, 'foundedYear': foundedYear};
 
   bool get isDeleted => deletedAt != null;
 

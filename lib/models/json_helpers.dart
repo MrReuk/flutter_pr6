@@ -33,9 +33,7 @@ int? jsonRefId(Object? value) {
 
 List<int> jsonRefIds(Object? value) {
   if (value is! List) return <int>[];
-  return <int>[
-    for (final element in value) ?jsonRefId(element),
-  ];
+  return <int>[for (final element in value) ?jsonRefId(element)];
 }
 
 DateTime? jsonDate(Object? value) {

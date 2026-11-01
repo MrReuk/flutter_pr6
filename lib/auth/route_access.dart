@@ -12,8 +12,7 @@ Permission? requiredPermission(String location) {
   ];
   if (segments.isEmpty) return null;
 
-  final writes =
-      segments.length >= 2 && (segments[1] == 'new' || segments.last == 'edit');
+  final writes = segments.length >= 2 && (segments[1] == 'new' || segments.last == 'edit');
 
   switch (segments.first) {
     case 'books':

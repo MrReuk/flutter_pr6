@@ -6,11 +6,7 @@ import '../repositories/book_repository.dart';
 import '../widgets/detail_layout.dart';
 
 class BooksCountField extends StatelessWidget {
-  const BooksCountField({
-    super.key,
-    required this.count,
-    required this.booksLocation,
-  });
+  const BooksCountField({super.key, required this.count, required this.booksLocation});
 
   final Future<int> Function(BookRepository books) count;
   final String booksLocation;

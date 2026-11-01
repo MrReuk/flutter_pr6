@@ -143,9 +143,7 @@ class _SessionGuardState extends State<SessionGuard> {
         children: [
           Positioned.fill(child: widget.child),
           if (warning) ...[
-            const Positioned.fill(
-              child: ModalBarrier(dismissible: false, color: Colors.black54),
-            ),
+            const Positioned.fill(child: ModalBarrier(dismissible: false, color: Colors.black54)),
             Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 420),

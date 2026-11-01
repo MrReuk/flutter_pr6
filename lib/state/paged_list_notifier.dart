@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../core/api_exceptions.dart';
 import '../models/page_result.dart';
 import '../repositories/entity_repository.dart';
 import '../repositories/repository_exception.dart';
@@ -16,9 +17,9 @@ class PagedListNotifier<T, Q> extends ChangeNotifier {
     required Q initialQuery,
     required EntityRepository<T, Q> repository,
     required int Function(T item) idOf,
-  })  : _query = initialQuery,
-        _repository = repository,
-        _idOf = idOf;
+  }) : _query = initialQuery,
+       _repository = repository,
+       _idOf = idOf;
 
   final EntityRepository<T, Q> _repository;
   final int Function(T item) _idOf;
@@ -27,6 +28,7 @@ class PagedListNotifier<T, Q> extends ChangeNotifier {
   PageResult<T> _result = PageResult<T>.empty();
   LoadStatus _status = LoadStatus.idle;
   String? _error;
+  bool _offline = false;
   final Set<int> _selected = {};
   int _requestId = 0;
   bool _disposed = false;
@@ -35,6 +37,9 @@ class PagedListNotifier<T, Q> extends ChangeNotifier {
   PageResult<T> get result => _result;
   LoadStatus get status => _status;
   String? get error => _error;
+
+  /// Последняя загрузка не удалась из-за недоступного сервера (а не из-за ответа с ошибкой).
+  bool get offline => _offline;
   Set<int> get selected => Set.unmodifiable(_selected);
   bool get hasSelection => _selected.isNotEmpty;
 
@@ -42,6 +47,7 @@ class PagedListNotifier<T, Q> extends ChangeNotifier {
     final requestId = ++_requestId;
     _status = LoadStatus.loading;
     _error = null;
+    _offline = false;
     notifyListeners();
 
     try {
@@ -52,6 +58,7 @@ class PagedListNotifier<T, Q> extends ChangeNotifier {
     } catch (e) {
       if (requestId != _requestId) return;
       _error = 'Не удалось загрузить список: ${describeError(e)}';
+      _offline = e is NetworkException;
       _status = LoadStatus.error;
     }
     notifyListeners();

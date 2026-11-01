@@ -59,10 +59,7 @@ class BookFormScreen extends StatelessWidget {
           required: true,
           keyboardType: TextInputType.number,
           formatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9-]'))],
-          validator: checks([
-            notBlank(),
-            integerInRange(1450, DateTime.now().year),
-          ]),
+          validator: checks([notBlank(), integerInRange(1450, DateTime.now().year)]),
         ),
         FieldSpec.text(
           key: 'pages',
@@ -77,9 +74,7 @@ class BookFormScreen extends StatelessWidget {
           label: 'Издательство',
           required: true,
           validator: mustChoose('Выберите издательство'),
-          options: (values) => refs.publisherOptions(
-            keep: [if (book != null) book.publisherId],
-          ),
+          options: (values) => refs.publisherOptions(keep: [if (book != null) book.publisherId]),
         ),
         FieldSpec.multi(
           key: 'authorIds',
@@ -92,8 +87,7 @@ class BookFormScreen extends StatelessWidget {
             keep: book?.authorIds ?? const [],
           ),
           narrowedSwitchLabel: 'Показать всех авторов',
-          narrowedHint:
-              'Показаны авторы, у которых уже есть книги этого издательства',
+          narrowedHint: 'Показаны авторы, у которых уже есть книги этого издательства',
         ),
         FieldSpec.multi(
           key: 'genreIds',

@@ -26,10 +26,10 @@ class Author {
   }
 
   Map<String, dynamic> toJson() => {
-        'fullName': fullName,
-        'country': country,
-        'birthYear': birthYear,
-      };
+    'fullName': fullName,
+    'country': country,
+    'birthYear': birthYear,
+  };
 
   bool get isDeleted => deletedAt != null;
 

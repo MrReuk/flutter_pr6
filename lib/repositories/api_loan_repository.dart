@@ -7,34 +7,30 @@ import '../models/simple_query.dart';
 import 'api_repository.dart';
 import 'entity_repository.dart';
 
-class ApiLoanRepository extends ApiRepository<Loan, SimpleQuery>
-    implements LoanRepository {
+class ApiLoanRepository extends ApiRepository<Loan, SimpleQuery> implements LoanRepository {
   ApiLoanRepository({required super.dio}) : super(resource: 'loans');
 
   @override
   Loan fromJson(Map<String, dynamic> json) => Loan.fromJson(json);
 
   @override
-  Map<String, dynamic> toBody(Loan item) => {
-        'readerId': item.readerId,
-        'bookId': item.bookId,
-      };
+  Map<String, dynamic> toBody(Loan item) => {'readerId': item.readerId, 'bookId': item.bookId};
 
   @override
   int idOf(Loan item) => item.id;
 
   @override
   Map<String, dynamic> queryOf(SimpleQuery query) => {
-        ...pagingQuery(
-          search: '',
-          sortField: query.sortField,
-          sortAscending: query.sortAscending,
-          page: query.page,
-          size: query.size,
-          includeDeleted: query.includeDeleted,
-        ),
-        if (query.filter.isNotEmpty) 'status': query.filter,
-      };
+    ...pagingQuery(
+      search: '',
+      sortField: query.sortField,
+      sortAscending: query.sortAscending,
+      page: query.page,
+      size: query.size,
+      includeDeleted: query.includeDeleted,
+    ),
+    if (query.filter.isNotEmpty) 'status': query.filter,
+  };
 
   @override
   Future<Loan> create(Loan item) {
@@ -47,11 +43,7 @@ class ApiLoanRepository extends ApiRepository<Loan, SimpleQuery>
   }
 
   @override
-  Future<Loan> issue({
-    required int readerId,
-    required int bookId,
-    required int days,
-  }) {
+  Future<Loan> issue({required int readerId, required int bookId, required int days}) {
     return guard(() async {
       final response = await dio.post<dynamic>(
         '/$resource',

@@ -19,10 +19,7 @@ class PublisherDetailScreen extends StatelessWidget {
       nameOf: (publisher) => publisher.name,
       isDeleted: (publisher) => publisher.isDeleted,
       fields: (context, publisher) => [
-        DetailField(
-          label: 'Город',
-          child: Text(publisher.city.isEmpty ? '—' : publisher.city),
-        ),
+        DetailField(label: 'Город', child: Text(publisher.city.isEmpty ? '—' : publisher.city)),
         DetailField(
           label: 'Год основания',
           child: Text(publisher.foundedYear == null ? '—' : '${publisher.foundedYear}'),

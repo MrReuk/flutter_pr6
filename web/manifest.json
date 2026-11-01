@@ -1,12 +1,12 @@
 {
-    "name": "library_app",
-    "short_name": "library_app",
+    "name": "Библиотека",
+    "short_name": "Библиотека",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "background_color": "#FAFAFA",
+    "theme_color": "#3F51B5",
+    "description": "Клиент библиотечной системы: каталог, выдачи, роли.",
+    "orientation": "any",
     "prefer_related_applications": false,
     "icons": [
         {
@@ -31,5 +31,6 @@
             "type": "image/png",
             "purpose": "maskable"
         }
-    ]
+    ],
+    "lang": "ru"
 }

@@ -1,46 +1,87 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
   <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
+    Базовый путь. При сборке Flutter подставляет сюда значение параметра
+    --base-href (например, /flutter_pr6/ для публикации в подкаталоге).
+    Путь обязан начинаться и заканчиваться косой чертой.
   -->
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Клиент библиотечной системы: каталог, выдачи, роли.">
+  <meta name="theme-color" content="#3f51b5">
 
-  <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="library_app">
+  <meta name="apple-mobile-web-app-title" content="Библиотека">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
-
-  <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>library_app</title>
+  <title>Библиотека</title>
   <link rel="manifest" href="manifest.json">
+
+  <!--
+    Экран-заглушка. Показывается сразу, пока скачивается и запускается
+    приложение; убирается по событию первого кадра Flutter.
+  -->
+  <style>
+    html, body { margin: 0; height: 100%; }
+    body { background: #fafafa; }
+    #splash {
+      position: fixed; inset: 0; z-index: 10;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 20px; background: #fafafa; color: #1c1b1f;
+      font-family: Roboto, "Segoe UI", system-ui, sans-serif;
+      transition: opacity 0.3s ease;
+    }
+    #splash.hide { opacity: 0; pointer-events: none; }
+    #splash .title { font-size: 28px; font-weight: 500; letter-spacing: 0.5px; }
+    #splash .note { font-size: 14px; color: #5f5f66; text-align: center; padding: 0 24px; }
+    #splash .spinner {
+      width: 44px; height: 44px; border-radius: 50%;
+      border: 4px solid #c5cae9; border-top-color: #3f51b5;
+      animation: splash-spin 0.9s linear infinite;
+    }
+    @keyframes splash-spin { to { transform: rotate(360deg); } }
+    @media (prefers-color-scheme: dark) {
+      body, #splash { background: #1c1b1f; color: #e6e1e5; }
+      #splash .note { color: #b0aab3; }
+      #splash .spinner { border-color: #3a3f5c; border-top-color: #9fa8da; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #splash .spinner { animation-duration: 3s; }
+    }
+  </style>
 </head>
 <body>
-  <!--
-    You can customize the "flutter_bootstrap.js" script.
-    This is useful to provide a custom configuration to the Flutter loader
-    or to give the user feedback during the initialization process.
+  <div id="splash" role="status" aria-live="polite">
+    <div class="title">Библиотека</div>
+    <div class="spinner" aria-hidden="true"></div>
+    <div class="note" id="splash-note">Загрузка приложения…</div>
+  </div>
+  <noscript>Для работы приложения нужен JavaScript.</noscript>
 
-    For more details:
-    * https://docs.flutter.dev/platform-integration/web/initialization
-  -->
-  <script src="flutter_bootstrap.js" async></script>
+  <script>
+    // Первый кадр нарисован: заглушка больше не нужна.
+    window.addEventListener('flutter-first-frame', function () {
+      var splash = document.getElementById('splash');
+      if (!splash) return;
+      splash.classList.add('hide');
+      setTimeout(function () { splash.remove(); }, 400);
+    });
+    // Файл загрузчика не скачался (обычно из-за неверного --base-href).
+    function splashFailed() {
+      var note = document.getElementById('splash-note');
+      if (note) {
+        note.textContent = 'Не удалось загрузить приложение. Проверьте соединение и обновите страницу.';
+      }
+      var spinner = document.querySelector('#splash .spinner');
+      if (spinner) spinner.style.display = 'none';
+    }
+  </script>
+  <script src="flutter_bootstrap.js" async onerror="splashFailed()"></script>
 </body>
 </html>

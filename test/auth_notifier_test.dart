@@ -49,7 +49,11 @@ void main() {
       await expectLater(
         auth.login('reader', 'неверный'),
         throwsA(
-          isA<UnauthorizedException>().having((e) => e.message, 'сообщение', 'Неверный логин или пароль'),
+          isA<UnauthorizedException>().having(
+            (e) => e.message,
+            'сообщение',
+            'Неверный логин или пароль',
+          ),
         ),
       );
 
@@ -282,7 +286,11 @@ void main() {
       await expectLater(
         auth.register(username: 'admin', password: 'abcdef1!', fullName: 'Дубль', email: ''),
         throwsA(
-          isA<ValidationException>().having((e) => e.errors['username'], 'ошибка логина', 'Такой логин уже занят'),
+          isA<ValidationException>().having(
+            (e) => e.errors['username'],
+            'ошибка логина',
+            'Такой логин уже занят',
+          ),
         ),
       );
       expect(auth.isAuthenticated, isFalse);

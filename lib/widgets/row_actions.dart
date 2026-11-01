@@ -23,11 +23,7 @@ List<Widget> buildRowActions(
   return [
     ...extra,
     if (onEdit != null && rights.canManage)
-      IconButton(
-        tooltip: 'Изменить',
-        icon: const Icon(Icons.edit_outlined),
-        onPressed: onEdit,
-      ),
+      IconButton(tooltip: 'Изменить', icon: const Icon(Icons.edit_outlined), onPressed: onEdit),
     if (deleted && rights.canRestore)
       IconButton(
         tooltip: 'Восстановить',
@@ -50,10 +46,7 @@ List<Widget> buildRowActions(
     if (rights.canHardDelete)
       IconButton(
         tooltip: 'Удалить навсегда',
-        icon: Icon(
-          Icons.delete_forever,
-          color: Theme.of(context).colorScheme.error,
-        ),
+        icon: Icon(Icons.delete_forever, color: Theme.of(context).colorScheme.error),
         onPressed: () async {
           final confirmed = await confirmAction(
             context,

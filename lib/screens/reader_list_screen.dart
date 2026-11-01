@@ -37,19 +37,12 @@ class ReaderListScreen extends StatelessWidget {
             sortField: 'fullName',
             build: (r) => Text(r.fullName),
           ),
-          TableColumnSpec<Reader>(
-            label: 'Почта',
-            sortField: 'email',
-            build: (r) => Text(r.email),
-          ),
+          TableColumnSpec<Reader>(label: 'Почта', sortField: 'email', build: (r) => Text(r.email)),
           TableColumnSpec<Reader>(
             label: 'Телефон',
             build: (r) => Text(r.phone.isEmpty ? '—' : r.phone),
           ),
-          TableColumnSpec<Reader>(
-            label: 'Билет',
-            build: (r) => Text(_cardLabel(r.card)),
-          ),
+          TableColumnSpec<Reader>(label: 'Билет', build: (r) => Text(_cardLabel(r.card))),
         ],
         idOf: (r) => r.id,
         isDeleted: (r) => r.isDeleted,

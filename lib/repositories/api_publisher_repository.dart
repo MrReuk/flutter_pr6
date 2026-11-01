@@ -7,7 +7,7 @@ import 'entity_repository.dart';
 class ApiPublisherRepository extends ApiRepository<Publisher, SimpleQuery>
     implements PublisherRepository {
   ApiPublisherRepository({required super.dio, required this.books})
-      : super(resource: 'publishers', cacheAll: true);
+    : super(resource: 'publishers', cacheAll: true);
 
   final BookRepository books;
 
@@ -22,13 +22,13 @@ class ApiPublisherRepository extends ApiRepository<Publisher, SimpleQuery>
 
   @override
   Map<String, dynamic> queryOf(SimpleQuery query) => pagingQuery(
-        search: query.search,
-        sortField: query.sortField,
-        sortAscending: query.sortAscending,
-        page: query.page,
-        size: query.size,
-        includeDeleted: query.includeDeleted,
-      );
+    search: query.search,
+    sortField: query.sortField,
+    sortAscending: query.sortAscending,
+    page: query.page,
+    size: query.size,
+    includeDeleted: query.includeDeleted,
+  );
 
   @override
   Future<String?> deleteBlocker(int id, {required bool permanent}) async {

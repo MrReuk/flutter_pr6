@@ -21,12 +21,12 @@ class ReferenceNotifier extends ChangeNotifier {
     required BookRepository books,
     required ReaderRepository readers,
     bool loadReaders = true,
-  })  : _loadReaders = loadReaders,
-        _genres = genres,
-        _publishers = publishers,
-        _authors = authors,
-        _books = books,
-        _readers = readers;
+  }) : _loadReaders = loadReaders,
+       _genres = genres,
+       _publishers = publishers,
+       _authors = authors,
+       _books = books,
+       _readers = readers;
 
   final GenreRepository _genres;
   final PublisherRepository _publishers;
@@ -58,10 +58,8 @@ class ReferenceNotifier extends ChangeNotifier {
   String? get error => _error;
 
   String genreName(int id) => _label(_genreNames, _deletedGenres, id, '—');
-  String publisherName(int id) =>
-      _label(_publisherNames, _deletedPublishers, id, '—');
-  String authorName(int id) =>
-      _label(_authorNames, _deletedAuthors, id, 'Неизвестный автор');
+  String publisherName(int id) => _label(_publisherNames, _deletedPublishers, id, '—');
+  String authorName(int id) => _label(_authorNames, _deletedAuthors, id, 'Неизвестный автор');
 
   String genreNames(List<int> ids) => ids.map(genreName).join(', ');
   String authorNames(List<int> ids) => ids.map(authorName).join(', ');
@@ -86,15 +84,14 @@ class ReferenceNotifier extends ChangeNotifier {
     return _options(titles, _deletedBooks, keep);
   }
 
-  List<NamedOption> authorOptionsForPublisher(
-    int? publisherId, {
-    Iterable<int> keep = const [],
-  }) {
+  List<NamedOption> authorOptionsForPublisher(int? publisherId, {Iterable<int> keep = const []}) {
     final ids = publisherId == null ? null : _authorsByPublisher[publisherId];
     if (ids == null || ids.isEmpty) return const [];
-    return _options(_authorNames, _deletedAuthors, keep)
-        .where((o) => ids.contains(o.id) || keep.contains(o.id))
-        .toList();
+    return _options(
+      _authorNames,
+      _deletedAuthors,
+      keep,
+    ).where((o) => ids.contains(o.id) || keep.contains(o.id)).toList();
   }
 
   Future<void> load({bool withLinks = false}) async {
@@ -111,9 +108,18 @@ class ReferenceNotifier extends ChangeNotifier {
       _genreNames = {for (final g in genres) g.id: g.name};
       _publisherNames = {for (final p in publishers) p.id: p.name};
       _authorNames = {for (final a in authors) a.id: a.fullName};
-      _deletedGenres = {for (final g in genres) if (g.isDeleted) g.id};
-      _deletedPublishers = {for (final p in publishers) if (p.isDeleted) p.id};
-      _deletedAuthors = {for (final a in authors) if (a.isDeleted) a.id};
+      _deletedGenres = {
+        for (final g in genres)
+          if (g.isDeleted) g.id,
+      };
+      _deletedPublishers = {
+        for (final p in publishers)
+          if (p.isDeleted) p.id,
+      };
+      _deletedAuthors = {
+        for (final a in authors)
+          if (a.isDeleted) a.id,
+      };
 
       if (withLinks) {
         final links = await Future.wait<Object?>([
@@ -126,17 +132,19 @@ class ReferenceNotifier extends ChangeNotifier {
         final byPublisher = <int, Set<int>>{};
         for (final book in books) {
           if (book.isDeleted) continue;
-          byPublisher
-              .putIfAbsent(book.publisherId, () => <int>{})
-              .addAll(book.authorIds);
+          byPublisher.putIfAbsent(book.publisherId, () => <int>{}).addAll(book.authorIds);
         }
         _authorsByPublisher = byPublisher;
-        _bookInfo = {
-          for (final b in books) b.id: (title: b.title, free: b.copiesAvailable),
+        _bookInfo = {for (final b in books) b.id: (title: b.title, free: b.copiesAvailable)};
+        _deletedBooks = {
+          for (final b in books)
+            if (b.isDeleted) b.id,
         };
-        _deletedBooks = {for (final b in books) if (b.isDeleted) b.id};
         _readerNames = {for (final r in readers) r.id: r.fullName};
-        _deletedReaders = {for (final r in readers) if (r.isDeleted) r.id};
+        _deletedReaders = {
+          for (final r in readers)
+            if (r.isDeleted) r.id,
+        };
       }
 
       _failed = false;
@@ -155,20 +163,14 @@ class ReferenceNotifier extends ChangeNotifier {
     return deleted.contains(id) ? '$name$kDeletedSuffix' : name;
   }
 
-  List<NamedOption> _options(
-    Map<int, String> names,
-    Set<int> deleted,
-    Iterable<int> keep,
-  ) {
+  List<NamedOption> _options(Map<int, String> names, Set<int> deleted, Iterable<int> keep) {
     final keepSet = keep.toSet();
     final list = <NamedOption>[
       for (final entry in names.entries)
         if (!deleted.contains(entry.key) || keepSet.contains(entry.key))
           (
             id: entry.key,
-            name: deleted.contains(entry.key)
-                ? '${entry.value}$kDeletedSuffix'
-                : entry.value,
+            name: deleted.contains(entry.key) ? '${entry.value}$kDeletedSuffix' : entry.value,
           ),
     ];
     list.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));

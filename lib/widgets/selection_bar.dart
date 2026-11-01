@@ -25,18 +25,12 @@ class SelectionBar extends StatelessWidget {
           spacing: 8,
           runSpacing: 4,
           children: [
-            Text(
-              'Выбрано: $count',
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
+            Text('Выбрано: $count', style: Theme.of(context).textTheme.titleSmall),
             Wrap(
               spacing: 8,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                TextButton(
-                  onPressed: onClear,
-                  child: const Text('Снять выделение'),
-                ),
+                TextButton(onPressed: onClear, child: const Text('Снять выделение')),
                 FilledButton.icon(
                   onPressed: onDelete,
                   icon: const Icon(Icons.delete),

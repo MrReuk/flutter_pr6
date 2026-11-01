@@ -48,10 +48,7 @@ class ApiStatsRepository implements StatsRepository {
   final Dio dio;
 
   Future<int> _total(String path, [Map<String, Object?> query = const {}]) async {
-    final response = await dio.get<dynamic>(
-      path,
-      queryParameters: {'size': 1, ...query},
-    );
+    final response = await dio.get<dynamic>(path, queryParameters: {'size': 1, ...query});
     return jsonInt(jsonMap(response.data)['total']);
   }
 

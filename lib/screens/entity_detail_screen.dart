@@ -45,9 +45,9 @@ class EntityDetailScreen<T> extends StatelessWidget {
       body: switch (detail.status) {
         LoadStatus.idle || LoadStatus.loading => const LoadingView(),
         LoadStatus.error => ErrorView(
-            message: detail.error ?? 'Неизвестная ошибка',
-            onRetry: detail.load,
-          ),
+          message: detail.error ?? 'Неизвестная ошибка',
+          onRetry: detail.load,
+        ),
         LoadStatus.success => _content(context, detail),
       },
     );

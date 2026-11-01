@@ -6,12 +6,7 @@ class Genre {
   final String description;
   final DateTime? deletedAt;
 
-  const Genre({
-    required this.id,
-    required this.name,
-    this.description = '',
-    this.deletedAt,
-  });
+  const Genre({required this.id, required this.name, this.description = '', this.deletedAt});
 
   factory Genre.fromJson(Map<String, dynamic> json) {
     return Genre(
@@ -22,10 +17,7 @@ class Genre {
     );
   }
 
-  Map<String, dynamic> toJson() => {
-        'name': name,
-        'description': description,
-      };
+  Map<String, dynamic> toJson() => {'name': name, 'description': description};
 
   bool get isDeleted => deletedAt != null;
 

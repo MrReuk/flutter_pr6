@@ -3,40 +3,36 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:library_app/validation/validators.dart';
 import 'package:library_app/widgets/entity_form.dart';
 
-const _options = [
-  (id: 1, name: 'Первый'),
-  (id: 2, name: 'Второй'),
-  (id: 3, name: 'Третий'),
-];
+const _options = [(id: 1, name: 'Первый'), (id: 2, name: 'Второй'), (id: 3, name: 'Третий')];
 
 List<FieldSpec> _fields() => [
-      FieldSpec.text(
-        key: 'name',
-        label: 'Название',
-        required: true,
-        validator: checks([notBlank(), minLength(3)]),
-      ),
-      FieldSpec.text(
-        key: 'year',
-        label: 'Год',
-        required: true,
-        validator: checks([notBlank(), integerInRange(1900, 2026)]),
-      ),
-      FieldSpec.dropdown(
-        key: 'choiceId',
-        label: 'Выбор',
-        required: true,
-        validator: mustChoose('Выберите вариант'),
-        options: (values) => _options,
-      ),
-      FieldSpec.multi(
-        key: 'tagIds',
-        label: 'Метки',
-        required: true,
-        validator: mustChooseAtLeastOne('Выберите хотя бы одну метку'),
-        options: (values) => _options,
-      ),
-    ];
+  FieldSpec.text(
+    key: 'name',
+    label: 'Название',
+    required: true,
+    validator: checks([notBlank(), minLength(3)]),
+  ),
+  FieldSpec.text(
+    key: 'year',
+    label: 'Год',
+    required: true,
+    validator: checks([notBlank(), integerInRange(1900, 2026)]),
+  ),
+  FieldSpec.dropdown(
+    key: 'choiceId',
+    label: 'Выбор',
+    required: true,
+    validator: mustChoose('Выберите вариант'),
+    options: (values) => _options,
+  ),
+  FieldSpec.multi(
+    key: 'tagIds',
+    label: 'Метки',
+    required: true,
+    validator: mustChooseAtLeastOne('Выберите хотя бы одну метку'),
+    options: (values) => _options,
+  ),
+];
 
 Future<void> _pumpForm(
   WidgetTester tester, {
@@ -149,11 +145,7 @@ void main() {
 
   testWidgets('Форма сообщает, есть ли несохранённые изменения', (tester) async {
     final states = <bool>[];
-    await _pumpForm(
-      tester,
-      onDirtyChanged: states.add,
-      initialValues: const {'name': 'Исходное'},
-    );
+    await _pumpForm(tester, onDirtyChanged: states.add, initialValues: const {'name': 'Исходное'});
 
     await tester.enterText(_field('Название *'), 'Исходное!');
     await tester.pump();

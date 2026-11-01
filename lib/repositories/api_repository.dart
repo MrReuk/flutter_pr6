@@ -92,11 +92,7 @@ abstract class ApiRepository<T, Q> implements EntityRepository<T, Q>, CachedRepo
       while (true) {
         final response = await dio.get<dynamic>(
           '/$resource',
-          queryParameters: {
-            'includeDeleted': 'true',
-            'size': kReferencePageSize,
-            'page': page,
-          },
+          queryParameters: {'includeDeleted': 'true', 'size': kReferencePageSize, 'page': page},
         );
         final chunk = parsePage(response.data);
         items.addAll(chunk.items);
@@ -138,10 +134,7 @@ abstract class ApiRepository<T, Q> implements EntityRepository<T, Q>, CachedRepo
   Future<T> update(T item) {
     return guard(() async {
       try {
-        final response = await dio.put<dynamic>(
-          '/$resource/${idOf(item)}',
-          data: toBody(item),
-        );
+        final response = await dio.put<dynamic>('/$resource/${idOf(item)}', data: toBody(item));
         return fromJson(jsonMap(response.data));
       } finally {
         invalidate();
@@ -171,10 +164,7 @@ abstract class ApiRepository<T, Q> implements EntityRepository<T, Q>, CachedRepo
     return guard(() async {
       await _ensureNotBlocked(id, permanent: true);
       try {
-        await dio.delete<dynamic>(
-          '/$resource/$id',
-          queryParameters: {'hard': 'true'},
-        );
+        await dio.delete<dynamic>('/$resource/$id', queryParameters: {'hard': 'true'});
       } finally {
         invalidate();
       }
@@ -201,10 +191,7 @@ abstract class ApiRepository<T, Q> implements EntityRepository<T, Q>, CachedRepo
       }
       if (allowed.isEmpty) return 0;
       try {
-        final response = await dio.post<dynamic>(
-          '/$resource/bulk-delete',
-          data: {'ids': allowed},
-        );
+        final response = await dio.post<dynamic>('/$resource/bulk-delete', data: {'ids': allowed});
         return jsonInt(jsonMap(response.data)['deleted']);
       } finally {
         invalidate();

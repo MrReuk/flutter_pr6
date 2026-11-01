@@ -23,5 +23,4 @@ int parseSizeParam(String? raw) {
   return (field: field, ascending: ascending);
 }
 
-String formatSortParam(String field, bool ascending) =>
-    '$field,${ascending ? 'asc' : 'desc'}';
+String formatSortParam(String field, bool ascending) => '$field,${ascending ? 'asc' : 'desc'}';

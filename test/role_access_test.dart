@@ -187,7 +187,15 @@ void main() {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(
         kUserKey,
-        _json(const AppUser(id: 3, username: 'reader', fullName: 'Смирнов П. А.', role: Role.admin, readerId: 1)),
+        _json(
+          const AppUser(
+            id: 3,
+            username: 'reader',
+            fullName: 'Смирнов П. А.',
+            role: Role.admin,
+            readerId: 1,
+          ),
+        ),
       );
       final reloaded = await makeAuth(server, prefs);
       await reloaded.restore();

@@ -56,9 +56,9 @@ void main() {
 
     test('у каждой роли есть экран, недоступный остальным', () {
       List<Permission> exclusive(Role role) => [
-            for (final p in Permission.values)
-              if (kPermissionRoles[p]!.length == 1 && kPermissionRoles[p]!.contains(role)) p,
-          ];
+        for (final p in Permission.values)
+          if (kPermissionRoles[p]!.length == 1 && kPermissionRoles[p]!.contains(role)) p,
+      ];
       expect(exclusive(Role.reader), contains(Permission.viewOwnLoans));
       expect(exclusive(Role.librarian), contains(Permission.useDesk));
       expect(exclusive(Role.admin), contains(Permission.manageUsers));
@@ -104,7 +104,13 @@ void main() {
     });
 
     test('читателю закрыты адреса записи и разделы персонала', () {
-      for (final location in ['/books/new', '/books/1/edit', '/readers', '/loans', '/admin/users']) {
+      for (final location in [
+        '/books/new',
+        '/books/1/edit',
+        '/readers',
+        '/loans',
+        '/admin/users',
+      ]) {
         final needed = requiredPermission(location)!;
         expect(roleCan(Role.reader, needed), isFalse, reason: location);
       }
@@ -123,7 +129,13 @@ void main() {
     });
 
     test('служебные экраны не используются как адрес возврата', () {
-      for (final value in ['/login', '/login?from=%2Fbooks', '/register', '/offline', '/forbidden']) {
+      for (final value in [
+        '/login',
+        '/login?from=%2Fbooks',
+        '/register',
+        '/offline',
+        '/forbidden',
+      ]) {
         expect(safeReturnTo(value), isNull, reason: value);
       }
     });
